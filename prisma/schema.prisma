@@ -1,0 +1,197 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../src/generated/prisma"
+  // multiSchema is stable in Prisma v7
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["public", "collab"]
+}
+
+// ============================================================================
+// User (public schema - read-only reference)
+// ============================================================================
+model User {
+  id           String   @id @db.Uuid
+  email        String
+  name         String
+  phone        String?
+  role         String   @default("staff")
+  storeId      String?  @map("store_id") @db.Uuid
+  avatarUrl    String?  @map("avatar_url")
+  passwordHash String?  @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  // collab relations
+  bugsCreated      Bug[]           @relation("BugCreatedBy")
+  bugsAssigned     Bug[]           @relation("BugAssignedTo")
+  bugComments      BugComment[]
+  ideasCreated     Idea[]
+  ideaComments     IdeaComment[]
+  ideaVotes        IdeaVote[]
+
+  @@map("users")
+  @@schema("public")
+}
+
+// ============================================================================
+// Bug Tracker (collab schema)
+// ============================================================================
+model Bug {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  description String?  @db.Text
+  status      String   @default("open") // open, in_progress, resolved, closed
+  priority    String   @default("medium") // low, medium, high, critical
+  repo        String?  // e.g. "ApronLabs/apronlabs-pwa"
+  createdById String   @map("created_by_id") @db.Uuid
+  assigneeId  String?  @map("assignee_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  createdBy   User          @relation("BugCreatedBy", fields: [createdById], references: [id])
+  assignee    User?         @relation("BugAssignedTo", fields: [assigneeId], references: [id])
+  comments    BugComment[]
+  attachments BugAttachment[]
+  githubLinks BugGithubLink[]
+
+  @@index([status])
+  @@index([priority])
+  @@index([createdById])
+  @@map("bugs")
+  @@schema("collab")
+}
+
+model BugComment {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  bugId     String   @map("bug_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  bug  Bug  @relation(fields: [bugId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([bugId])
+  @@map("bug_comments")
+  @@schema("collab")
+}
+
+model BugAttachment {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  bugId     String   @map("bug_id") @db.Uuid
+  fileName  String   @map("file_name")
+  fileUrl   String   @map("file_url")
+  fileSize  Int?     @map("file_size")
+  mimeType  String?  @map("mime_type")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  bug Bug @relation(fields: [bugId], references: [id], onDelete: Cascade)
+
+  @@index([bugId])
+  @@map("bug_attachments")
+  @@schema("collab")
+}
+
+model BugGithubLink {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  bugId      String   @map("bug_id") @db.Uuid
+  githubType String   @map("github_type") // "issue" or "pr"
+  repo       String   // e.g. "ApronLabs/apronlabs-pwa"
+  number     Int      // GitHub issue/PR number
+  title      String?
+  url        String
+  state      String?  // open, closed, merged
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  bug Bug @relation(fields: [bugId], references: [id], onDelete: Cascade)
+
+  @@unique([bugId, repo, number])
+  @@index([bugId])
+  @@map("bug_github_links")
+  @@schema("collab")
+}
+
+// ============================================================================
+// Idea Board (collab schema)
+// ============================================================================
+model Idea {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  description String?  @db.Text
+  status      String   @default("proposed") // proposed, discussing, approved, in_progress, done, rejected
+  createdById String   @map("created_by_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  createdBy User          @relation(fields: [createdById], references: [id])
+  comments  IdeaComment[]
+  votes     IdeaVote[]
+  tagLinks  IdeaTagLink[]
+
+  @@index([status])
+  @@index([createdById])
+  @@map("ideas")
+  @@schema("collab")
+}
+
+model IdeaComment {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ideaId    String   @map("idea_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([ideaId])
+  @@map("idea_comments")
+  @@schema("collab")
+}
+
+model IdeaVote {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ideaId    String   @map("idea_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([ideaId, userId])
+  @@map("idea_votes")
+  @@schema("collab")
+}
+
+// ============================================================================
+// Tags (collab schema)
+// ============================================================================
+model Tag {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String   @unique
+  color     String   @default("#6B7684")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  ideaLinks IdeaTagLink[]
+
+  @@map("tags")
+  @@schema("collab")
+}
+
+model IdeaTagLink {
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ideaId String @map("idea_id") @db.Uuid
+  tagId  String @map("tag_id") @db.Uuid
+
+  idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([ideaId, tagId])
+  @@map("idea_tag_links")
+  @@schema("collab")
+}
