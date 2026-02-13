@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Plus, ThumbsUp, MessageCircle } from 'lucide-react';
+import { Plus, Lightbulb, CheckCircle2, Circle, ThumbsUp, MessageCircle } from 'lucide-react';
 import { useIdeas, useToggleVote } from '@/lib/hooks/use-ideas';
-import { Button, Badge, Card, SkeletonList } from '@/components/ui';
+import { Button, Card, SkeletonList } from '@/components/ui';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -20,16 +20,28 @@ const STATUS_OPTIONS = [
   { value: 'rejected', label: '거절됨' },
 ];
 
-const statusBadge = (status: string) => {
-  const map: Record<string, { variant: 'primary' | 'warning' | 'success' | 'error' | 'default'; label: string }> = {
-    proposed: { variant: 'primary', label: '제안됨' },
-    discussing: { variant: 'warning', label: '논의중' },
-    approved: { variant: 'success', label: '승인됨' },
-    in_progress: { variant: 'warning', label: '진행중' },
-    done: { variant: 'success', label: '완료' },
-    rejected: { variant: 'error', label: '거절됨' },
+const statusIcon = (status: string) => {
+  switch (status) {
+    case 'proposed': return <Lightbulb className="h-4 w-4 text-blue-500" />;
+    case 'discussing': return <Lightbulb className="h-4 w-4 text-yellow-500" />;
+    case 'approved': return <Lightbulb className="h-4 w-4 text-green-500" />;
+    case 'in_progress': return <Lightbulb className="h-4 w-4 text-orange-500" />;
+    case 'done': return <CheckCircle2 className="h-4 w-4 text-purple-500" />;
+    case 'rejected': return <CheckCircle2 className="h-4 w-4 text-gray-400" />;
+    default: return <Circle className="h-4 w-4 text-gray-400" />;
+  }
+};
+
+const statusLabel = (status: string) => {
+  const map: Record<string, { text: string; color: string }> = {
+    proposed: { text: '제안됨', color: 'text-blue-600 bg-blue-50' },
+    discussing: { text: '논의중', color: 'text-yellow-600 bg-yellow-50' },
+    approved: { text: '승인됨', color: 'text-green-600 bg-green-50' },
+    in_progress: { text: '진행중', color: 'text-orange-600 bg-orange-50' },
+    done: { text: '완료', color: 'text-purple-600 bg-purple-50' },
+    rejected: { text: '거절됨', color: 'text-gray-500 bg-gray-100' },
   };
-  return map[status] || { variant: 'default' as const, label: status };
+  return map[status] || { text: status, color: 'text-gray-500 bg-gray-100' };
 };
 
 export default function IdeasPage() {
@@ -81,52 +93,49 @@ export default function IdeasPage() {
           <p className="text-gray-500 text-sm">등록된 아이디어가 없습니다</p>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
           {(ideas as IdeaListItem[]).map((idea) => {
-            const sb = statusBadge(idea.status);
+            const sl = statusLabel(idea.status);
 
             return (
-              <Link key={idea.id} href={`/ideas/${idea.id}`}>
-                <Card interactive className="h-full flex flex-col">
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    <Badge variant={sb.variant} size="sm">{sb.label}</Badge>
+              <Link key={idea.id} href={`/ideas/${idea.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                {statusIcon(idea.status)}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-900 truncate">{idea.title}</span>
+                    <span className={`text-2xs px-1.5 py-0.5 rounded font-medium shrink-0 ${sl.color}`}>{sl.text}</span>
                     {idea.tagLinks.map(({ tag }) => (
                       <span
                         key={tag.name}
-                        className="text-2xs px-1.5 py-0.5 rounded"
+                        className="text-2xs px-1.5 py-0.5 rounded font-medium shrink-0"
                         style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
                       >
                         {tag.name}
                       </span>
                     ))}
                   </div>
-                  <h3 className="text-sm font-medium text-gray-900 mb-1">{idea.title}</h3>
-                  {idea.description ? (
-                    <p className="text-xs text-gray-500 line-clamp-2 mb-2">{idea.description}</p>
-                  ) : null}
-                  <div className="mt-auto flex items-center justify-between pt-2">
-                    <div className="text-xs text-gray-500">
-                      <span>{idea.createdBy?.name}</span>
-                      <span className="mx-1">·</span>
-                      <span>{formatDistanceToNow(new Date(idea.createdAt), { addSuffix: true, locale: ko })}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={(e) => handleVote(e, idea.id)}
-                        className={`flex items-center gap-1 text-xs ${
-                          idea.hasVoted ? 'text-brand font-medium' : 'text-gray-400'
-                        }`}
-                      >
-                        <ThumbsUp className="h-3.5 w-3.5" />
-                        {idea._count?.votes || 0}
-                      </button>
-                      <span className="flex items-center gap-1 text-xs text-gray-400">
-                        <MessageCircle className="h-3.5 w-3.5" />
-                        {idea._count?.comments || 0}
-                      </span>
-                    </div>
+                  <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-500">
+                    <span>{idea.createdBy?.name}</span>
+                    <span>{formatDistanceToNow(new Date(idea.createdAt), { addSuffix: true, locale: ko })}</span>
                   </div>
-                </Card>
+                </div>
+                <div className="flex items-center gap-3 shrink-0 text-xs text-gray-400">
+                  <button
+                    onClick={(e) => handleVote(e, idea.id)}
+                    className={`flex items-center gap-1 ${
+                      idea.hasVoted ? 'text-brand font-medium' : 'text-gray-400'
+                    }`}
+                  >
+                    <ThumbsUp className="h-3.5 w-3.5" />
+                    {idea._count?.votes || 0}
+                  </button>
+                  {idea._count?.comments > 0 && (
+                    <span className="flex items-center gap-1">
+                      <MessageCircle className="h-3.5 w-3.5" />
+                      {idea._count.comments}
+                    </span>
+                  )}
+                </div>
               </Link>
             );
           })}
