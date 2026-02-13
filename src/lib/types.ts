@@ -89,8 +89,19 @@ export interface IdeaComment {
   user: UserSummary;
 }
 
+export interface IdeaAttachment {
+  id: string;
+  ideaId: string;
+  fileName: string;
+  fileUrl: string;
+  fileSize: number | null;
+  mimeType: string | null;
+  createdAt: string;
+}
+
 export interface IdeaDetail extends IdeaListItem {
   comments: IdeaComment[];
+  attachments: IdeaAttachment[];
 }
 
 export interface Tag {

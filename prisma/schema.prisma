@@ -127,10 +127,11 @@ model Idea {
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
-  createdBy User          @relation(fields: [createdById], references: [id])
-  comments  IdeaComment[]
-  votes     IdeaVote[]
-  tagLinks  IdeaTagLink[]
+  createdBy   User              @relation(fields: [createdById], references: [id])
+  comments    IdeaComment[]
+  votes       IdeaVote[]
+  tagLinks    IdeaTagLink[]
+  attachments IdeaAttachment[]
 
   @@index([status])
   @@index([createdById])
@@ -165,6 +166,22 @@ model IdeaVote {
 
   @@unique([ideaId, userId])
   @@map("idea_votes")
+  @@schema("collab")
+}
+
+model IdeaAttachment {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ideaId    String   @map("idea_id") @db.Uuid
+  fileName  String   @map("file_name")
+  fileUrl   String   @map("file_url")
+  fileSize  Int?     @map("file_size")
+  mimeType  String?  @map("mime_type")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+
+  @@index([ideaId])
+  @@map("idea_attachments")
   @@schema("collab")
 }
 

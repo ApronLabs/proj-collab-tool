@@ -104,6 +104,45 @@ export function useTags() {
   });
 }
 
+export function useUploadIdeaAttachment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ ideaId, file }: { ideaId: string; file: File }) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch(`/collab/api/ideas/${ideaId}/attachments`, {
+        method: 'POST',
+        body: formData,
+      });
+      if (!res.ok) throw new Error('Upload failed');
+      return res.json();
+    },
+    onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['idea', vars.ideaId] }),
+  });
+}
+
+export function useAddIdeaYoutubeLink() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ ideaId, youtubeUrl, title }: { ideaId: string; youtubeUrl: string; title?: string }) =>
+      fetchJson(`/collab/api/ideas/${ideaId}/attachments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ youtubeUrl, title }),
+      }),
+    onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['idea', vars.ideaId] }),
+  });
+}
+
+export function useDeleteIdeaAttachment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ ideaId, attachmentId }: { ideaId: string; attachmentId: string }) =>
+      fetchJson(`/collab/api/ideas/${ideaId}/attachments?attachmentId=${attachmentId}`, { method: 'DELETE' }),
+    onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['idea', vars.ideaId] }),
+  });
+}
+
 export function useCreateTag() {
   const qc = useQueryClient();
   return useMutation({

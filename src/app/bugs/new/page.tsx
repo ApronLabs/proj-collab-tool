@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { useCreateBug } from '@/lib/hooks/use-bugs';
+import { useCreateBug, useUploadBugAttachment, useAddBugYoutubeLink } from '@/lib/hooks/use-bugs';
 import { useCreateGithubIssue } from '@/lib/hooks/use-github';
 import { Button, Input, Card } from '@/components/ui';
 import { Textarea } from '@/components/ui/textarea';
+import { MediaPicker, type PendingFile, type PendingYoutube } from '@/components/media/media-picker';
 
 const REPOS = ['ApronLabs/apronlabs-pwa', 'ApronLabs/barcode-scanner'];
 const PRIORITIES = [
@@ -19,6 +20,8 @@ const PRIORITIES = [
 export default function NewBugPage() {
   const router = useRouter();
   const createBug = useCreateBug();
+  const uploadAttachment = useUploadBugAttachment();
+  const addYoutubeLink = useAddBugYoutubeLink();
   const createGithubIssue = useCreateGithubIssue();
 
   const [title, setTitle] = useState('');
@@ -26,13 +29,23 @@ export default function NewBugPage() {
   const [priority, setPriority] = useState('medium');
   const [repo, setRepo] = useState('');
   const [createGithub, setCreateGithub] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
+  const [pendingYoutubeLinks, setPendingYoutubeLinks] = useState<PendingYoutube[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
 
+    setIsSubmitting(true);
     try {
       const bug = await createBug.mutateAsync({ title, description, priority, repo });
+
+      // Upload files and YouTube links
+      await Promise.all([
+        ...pendingFiles.map((f) => uploadAttachment.mutateAsync({ bugId: bug.id, file: f.file })),
+        ...pendingYoutubeLinks.map((yt) => addYoutubeLink.mutateAsync({ bugId: bug.id, youtubeUrl: yt.url })),
+      ]);
 
       if (createGithub && repo) {
         await createGithubIssue.mutateAsync({
@@ -47,6 +60,8 @@ export default function NewBugPage() {
       router.push(`/bugs/${bug.id}`);
     } catch {
       toast.error('버그 등록에 실패했습니다');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -70,6 +85,18 @@ export default function NewBugPage() {
             onChange={(e) => setDescription(e.target.value)}
             rows={6}
           />
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">미디어</label>
+            <MediaPicker
+              files={pendingFiles}
+              youtubeLinks={pendingYoutubeLinks}
+              onAddFiles={(newFiles) => setPendingFiles((prev) => [...prev, ...newFiles])}
+              onRemoveFile={(i) => setPendingFiles((prev) => prev.filter((_, idx) => idx !== i))}
+              onAddYoutube={(link) => setPendingYoutubeLinks((prev) => [...prev, link])}
+              onRemoveYoutube={(i) => setPendingYoutubeLinks((prev) => prev.filter((_, idx) => idx !== i))}
+            />
+          </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -116,7 +143,7 @@ export default function NewBugPage() {
             <Button variant="ghost" type="button" onClick={() => router.back()}>
               취소
             </Button>
-            <Button type="submit" isLoading={createBug.isPending}>
+            <Button type="submit" isLoading={isSubmitting}>
               등록
             </Button>
           </div>

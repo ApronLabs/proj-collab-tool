@@ -1,17 +1,18 @@
 'use client';
 
-import { useState, useRef, use } from 'react';
+import { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { ArrowLeft, Paperclip, Send, Github, Trash2, ExternalLink, Image as ImageIcon } from 'lucide-react';
-import { useBug, useUpdateBug, useDeleteBug, useAddBugComment, useUploadBugAttachment, useUnlinkBugGithub } from '@/lib/hooks/use-bugs';
+import { ArrowLeft, Send, Github, Trash2, ExternalLink } from 'lucide-react';
+import { useBug, useUpdateBug, useDeleteBug, useAddBugComment, useUploadBugAttachment, useAddBugYoutubeLink, useDeleteBugAttachment, useUnlinkBugGithub } from '@/lib/hooks/use-bugs';
 import { Button, Card, Input } from '@/components/ui';
 import { useAuth } from '@/components/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
+import { MediaSection } from '@/components/media/media-section';
 import Link from 'next/link';
-import type { BugDetail, BugComment as BugCommentType, BugAttachment, BugGithubLink } from '@/lib/types';
+import type { BugDetail, BugComment as BugCommentType, BugGithubLink } from '@/lib/types';
 
 const STATUS_OPTIONS = [
   { value: 'open', label: '열림' },
@@ -36,10 +37,11 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
   const deleteBug = useDeleteBug();
   const addComment = useAddBugComment();
   const uploadAttachment = useUploadBugAttachment();
+  const addYoutubeLink = useAddBugYoutubeLink();
+  const deleteAttachment = useDeleteBugAttachment();
   const unlinkGithub = useUnlinkBugGithub();
 
   const [comment, setComment] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (isLoading) {
     return (
@@ -80,16 +82,31 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
     toast.success('댓글이 추가되었습니다');
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleFileUpload = async (file: File) => {
     try {
       await uploadAttachment.mutateAsync({ bugId: id, file });
       toast.success('파일이 업로드되었습니다');
     } catch {
       toast.error('업로드에 실패했습니다');
     }
-    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleAddYoutube = async (youtubeUrl: string, title?: string) => {
+    try {
+      await addYoutubeLink.mutateAsync({ bugId: id, youtubeUrl, title });
+      toast.success('YouTube 링크가 추가되었습니다');
+    } catch {
+      toast.error('추가에 실패했습니다');
+    }
+  };
+
+  const handleDeleteAttachment = async (attachmentId: string) => {
+    try {
+      await deleteAttachment.mutateAsync({ bugId: id, attachmentId });
+      toast.success('삭제되었습니다');
+    } catch {
+      toast.error('삭제에 실패했습니다');
+    }
   };
 
   const handleUnlinkGithub = async (linkId: string) => {
@@ -188,52 +205,14 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
         </Card>
       )}
 
-      {/* Attachments */}
-      {bug.attachments?.length > 0 && (
-        <Card>
-          <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-1.5">
-            <ImageIcon className="h-4 w-4" /> 첨부파일
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {(bug as BugDetail).attachments.map((att: BugAttachment) => (
-              <a
-                key={att.id}
-                href={att.fileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block rounded-md overflow-hidden border border-gray-200 hover:border-brand transition-colors"
-              >
-                {att.mimeType?.startsWith('image/') ? (
-                  <img src={att.fileUrl} alt={att.fileName} className="w-full h-24 object-cover" />
-                ) : (
-                  <div className="h-24 flex items-center justify-center bg-gray-50 text-xs text-gray-500">
-                    {att.fileName}
-                  </div>
-                )}
-              </a>
-            ))}
-          </div>
-        </Card>
-      )}
-
-      {/* Upload */}
-      <div className="flex gap-2">
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*,.pdf,.txt,.log"
-          onChange={handleFileUpload}
-          className="hidden"
-        />
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => fileInputRef.current?.click()}
-          isLoading={uploadAttachment.isPending}
-        >
-          <Paperclip className="h-4 w-4" /> 파일 첨부
-        </Button>
-      </div>
+      {/* Media Section */}
+      <MediaSection
+        attachments={(bug as BugDetail).attachments || []}
+        onUploadFile={handleFileUpload}
+        onAddYoutubeLink={handleAddYoutube}
+        onDelete={handleDeleteAttachment}
+        isUploading={uploadAttachment.isPending}
+      />
 
       {/* Comments */}
       <Card>

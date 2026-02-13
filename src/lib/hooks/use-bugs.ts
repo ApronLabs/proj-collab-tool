@@ -104,6 +104,28 @@ export function useUploadBugAttachment() {
   });
 }
 
+export function useAddBugYoutubeLink() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ bugId, youtubeUrl, title }: { bugId: string; youtubeUrl: string; title?: string }) =>
+      fetchJson(`/collab/api/bugs/${bugId}/attachments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ youtubeUrl, title }),
+      }),
+    onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['bug', vars.bugId] }),
+  });
+}
+
+export function useDeleteBugAttachment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ bugId, attachmentId }: { bugId: string; attachmentId: string }) =>
+      fetchJson(`/collab/api/bugs/${bugId}/attachments?attachmentId=${attachmentId}`, { method: 'DELETE' }),
+    onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['bug', vars.bugId] }),
+  });
+}
+
 export function useLinkBugGithub() {
   const qc = useQueryClient();
   return useMutation({

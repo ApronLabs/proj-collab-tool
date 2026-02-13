@@ -6,10 +6,11 @@ import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { ArrowLeft, ThumbsUp, Send, Trash2 } from 'lucide-react';
-import { useIdea, useUpdateIdea, useDeleteIdea, useAddIdeaComment, useToggleVote } from '@/lib/hooks/use-ideas';
+import { useIdea, useUpdateIdea, useDeleteIdea, useAddIdeaComment, useToggleVote, useUploadIdeaAttachment, useAddIdeaYoutubeLink, useDeleteIdeaAttachment } from '@/lib/hooks/use-ideas';
 import { Button, Card, Input } from '@/components/ui';
 import { useAuth } from '@/components/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
+import { MediaSection } from '@/components/media/media-section';
 import Link from 'next/link';
 import type { IdeaDetail, IdeaComment as IdeaCommentType } from '@/lib/types';
 
@@ -31,6 +32,9 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
   const deleteIdea = useDeleteIdea();
   const addComment = useAddIdeaComment();
   const toggleVote = useToggleVote();
+  const uploadAttachment = useUploadIdeaAttachment();
+  const addYoutubeLink = useAddIdeaYoutubeLink();
+  const deleteAttachment = useDeleteIdeaAttachment();
 
   const [comment, setComment] = useState('');
 
@@ -72,6 +76,33 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
       await toggleVote.mutateAsync(id);
     } catch {
       toast.error('투표 실패');
+    }
+  };
+
+  const handleFileUpload = async (file: File) => {
+    try {
+      await uploadAttachment.mutateAsync({ ideaId: id, file });
+      toast.success('파일이 업로드되었습니다');
+    } catch {
+      toast.error('업로드에 실패했습니다');
+    }
+  };
+
+  const handleAddYoutube = async (youtubeUrl: string, title?: string) => {
+    try {
+      await addYoutubeLink.mutateAsync({ ideaId: id, youtubeUrl, title });
+      toast.success('YouTube 링크가 추가되었습니다');
+    } catch {
+      toast.error('추가에 실패했습니다');
+    }
+  };
+
+  const handleDeleteAttachment = async (attachmentId: string) => {
+    try {
+      await deleteAttachment.mutateAsync({ ideaId: id, attachmentId });
+      toast.success('삭제되었습니다');
+    } catch {
+      toast.error('삭제에 실패했습니다');
     }
   };
 
@@ -147,6 +178,15 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
           <p className="text-sm text-gray-700 whitespace-pre-wrap">{idea.description}</p>
         </Card>
       )}
+
+      {/* Media Section */}
+      <MediaSection
+        attachments={(idea as IdeaDetail).attachments || []}
+        onUploadFile={handleFileUpload}
+        onAddYoutubeLink={handleAddYoutube}
+        onDelete={handleDeleteAttachment}
+        isUploading={uploadAttachment.isPending}
+      />
 
       {/* Comments */}
       <Card>

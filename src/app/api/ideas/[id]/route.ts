@@ -15,6 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         include: { user: { select: { id: true, name: true, avatarUrl: true } } },
         orderBy: { createdAt: 'asc' },
       },
+      attachments: { orderBy: { createdAt: 'asc' } },
       tagLinks: { include: { tag: true } },
       _count: { select: { votes: true } },
       votes: userId ? { where: { userId }, select: { id: true } } : false,

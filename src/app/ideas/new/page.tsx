@@ -3,18 +3,24 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { useCreateIdea, useTags } from '@/lib/hooks/use-ideas';
+import { useCreateIdea, useTags, useUploadIdeaAttachment, useAddIdeaYoutubeLink } from '@/lib/hooks/use-ideas';
 import { Button, Input, Card } from '@/components/ui';
 import { Textarea } from '@/components/ui/textarea';
+import { MediaPicker, type PendingFile, type PendingYoutube } from '@/components/media/media-picker';
 
 export default function NewIdeaPage() {
   const router = useRouter();
   const createIdea = useCreateIdea();
+  const uploadAttachment = useUploadIdeaAttachment();
+  const addYoutubeLink = useAddIdeaYoutubeLink();
   const { data: tags } = useTags();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
+  const [pendingYoutubeLinks, setPendingYoutubeLinks] = useState<PendingYoutube[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const toggleTag = (tagId: string) => {
     setSelectedTags((prev) =>
@@ -26,16 +32,26 @@ export default function NewIdeaPage() {
     e.preventDefault();
     if (!title.trim()) return;
 
+    setIsSubmitting(true);
     try {
       const idea = await createIdea.mutateAsync({
         title,
         description,
         tagIds: selectedTags,
       });
+
+      // Upload files and YouTube links
+      await Promise.all([
+        ...pendingFiles.map((f) => uploadAttachment.mutateAsync({ ideaId: idea.id, file: f.file })),
+        ...pendingYoutubeLinks.map((yt) => addYoutubeLink.mutateAsync({ ideaId: idea.id, youtubeUrl: yt.url })),
+      ]);
+
       toast.success('아이디어가 등록되었습니다');
       router.push(`/ideas/${idea.id}`);
     } catch {
       toast.error('등록에 실패했습니다');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -59,6 +75,18 @@ export default function NewIdeaPage() {
             onChange={(e) => setDescription(e.target.value)}
             rows={6}
           />
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">미디어</label>
+            <MediaPicker
+              files={pendingFiles}
+              youtubeLinks={pendingYoutubeLinks}
+              onAddFiles={(newFiles) => setPendingFiles((prev) => [...prev, ...newFiles])}
+              onRemoveFile={(i) => setPendingFiles((prev) => prev.filter((_, idx) => idx !== i))}
+              onAddYoutube={(link) => setPendingYoutubeLinks((prev) => [...prev, link])}
+              onRemoveYoutube={(i) => setPendingYoutubeLinks((prev) => prev.filter((_, idx) => idx !== i))}
+            />
+          </div>
 
           {tags?.length > 0 && (
             <div>
@@ -86,7 +114,7 @@ export default function NewIdeaPage() {
             <Button variant="ghost" type="button" onClick={() => router.back()}>
               취소
             </Button>
-            <Button type="submit" isLoading={createIdea.isPending}>
+            <Button type="submit" isLoading={isSubmitting}>
               등록
             </Button>
           </div>

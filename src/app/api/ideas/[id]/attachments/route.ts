@@ -18,9 +18,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     if (!youtubeUrl) {
       return NextResponse.json({ error: 'youtubeUrl is required' }, { status: 400 });
     }
-    const attachment = await prisma.bugAttachment.create({
+    const attachment = await prisma.ideaAttachment.create({
       data: {
-        bugId: id,
+        ideaId: id,
         fileName: title || 'YouTube 영상',
         fileUrl: youtubeUrl,
         fileSize: null,
@@ -43,15 +43,15 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   const ext = path.extname(file.name) || '.png';
   const fileName = `${uuidv4()}${ext}`;
-  const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'bugs');
+  const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'ideas');
   await mkdir(uploadDir, { recursive: true });
   await writeFile(path.join(uploadDir, fileName), buffer);
 
-  const fileUrl = `/collab/uploads/bugs/${fileName}`;
+  const fileUrl = `/collab/uploads/ideas/${fileName}`;
 
-  const attachment = await prisma.bugAttachment.create({
+  const attachment = await prisma.ideaAttachment.create({
     data: {
-      bugId: id,
+      ideaId: id,
       fileName: file.name,
       fileUrl,
       fileSize: buffer.length,
@@ -72,7 +72,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'attachmentId is required' }, { status: 400 });
   }
 
-  const attachment = await prisma.bugAttachment.findUnique({ where: { id: attachmentId } });
+  const attachment = await prisma.ideaAttachment.findUnique({ where: { id: attachmentId } });
   if (!attachment) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
@@ -87,6 +87,6 @@ export async function DELETE(request: NextRequest) {
     }
   }
 
-  await prisma.bugAttachment.delete({ where: { id: attachmentId } });
+  await prisma.ideaAttachment.delete({ where: { id: attachmentId } });
   return NextResponse.json({ success: true });
 }
