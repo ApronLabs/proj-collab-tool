@@ -17,7 +17,7 @@ export function Card({ children, className, onClick, interactive, padding = "def
     <Component
       onClick={onClick}
       className={cn(
-        "rounded-md bg-white shadow-sm",
+        "rounded-lg bg-white border border-gray-200 shadow-sm",
         paddingClass,
         interactive && "hover:bg-gray-50 active:bg-gray-100 cursor-pointer transition-colors duration-150",
         onClick && "w-full text-left",
