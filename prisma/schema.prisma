@@ -43,7 +43,7 @@ model Bug {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title       String
   description String?  @db.Text
-  status      String   @default("open") // open, in_progress, resolved, closed
+  status      String   @default("open") // open, in_progress, resolved
   priority    String   @default("medium") // low, medium, high, critical
   repo        String?  // e.g. "ApronLabs/apronlabs-pwa"
   createdById String   @map("created_by_id") @db.Uuid
@@ -122,7 +122,7 @@ model Idea {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title       String
   description String?  @db.Text
-  status      String   @default("proposed") // proposed, discussing, approved, in_progress, done, rejected
+  status      String   @default("proposed") // proposed, in_progress, done
   createdById String   @map("created_by_id") @db.Uuid
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()

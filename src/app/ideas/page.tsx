@@ -12,34 +12,25 @@ import type { IdeaListItem } from '@/lib/types';
 
 const STATUS_OPTIONS = [
   { value: '', label: '전체' },
-  { value: 'proposed', label: '제안됨' },
-  { value: 'discussing', label: '논의중' },
-  { value: 'approved', label: '승인됨' },
+  { value: 'proposed', label: '등록' },
   { value: 'in_progress', label: '진행중' },
   { value: 'done', label: '완료' },
-  { value: 'rejected', label: '거절됨' },
 ];
 
 const statusIcon = (status: string) => {
   switch (status) {
-    case 'proposed': return <Lightbulb className="h-4 w-4 text-blue-500" />;
-    case 'discussing': return <Lightbulb className="h-4 w-4 text-yellow-500" />;
-    case 'approved': return <Lightbulb className="h-4 w-4 text-green-500" />;
-    case 'in_progress': return <Lightbulb className="h-4 w-4 text-orange-500" />;
+    case 'proposed': return <Lightbulb className="h-4 w-4 text-green-500" />;
+    case 'in_progress': return <Lightbulb className="h-4 w-4 text-yellow-500" />;
     case 'done': return <CheckCircle2 className="h-4 w-4 text-purple-500" />;
-    case 'rejected': return <CheckCircle2 className="h-4 w-4 text-gray-400" />;
     default: return <Circle className="h-4 w-4 text-gray-400" />;
   }
 };
 
 const statusLabel = (status: string) => {
   const map: Record<string, { text: string; color: string }> = {
-    proposed: { text: '제안됨', color: 'text-blue-600 bg-blue-50' },
-    discussing: { text: '논의중', color: 'text-yellow-600 bg-yellow-50' },
-    approved: { text: '승인됨', color: 'text-green-600 bg-green-50' },
-    in_progress: { text: '진행중', color: 'text-orange-600 bg-orange-50' },
+    proposed: { text: '등록', color: 'text-green-600 bg-green-50' },
+    in_progress: { text: '진행중', color: 'text-yellow-600 bg-yellow-50' },
     done: { text: '완료', color: 'text-purple-600 bg-purple-50' },
-    rejected: { text: '거절됨', color: 'text-gray-500 bg-gray-100' },
   };
   return map[status] || { text: status, color: 'text-gray-500 bg-gray-100' };
 };

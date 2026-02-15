@@ -15,10 +15,9 @@ import Link from 'next/link';
 import type { BugDetail, BugComment as BugCommentType, BugGithubLink } from '@/lib/types';
 
 const STATUS_OPTIONS = [
-  { value: 'open', label: '열림' },
+  { value: 'open', label: '등록' },
   { value: 'in_progress', label: '진행중' },
-  { value: 'resolved', label: '해결됨' },
-  { value: 'closed', label: '닫힘' },
+  { value: 'resolved', label: '완료' },
 ];
 
 const PRIORITY_OPTIONS = [

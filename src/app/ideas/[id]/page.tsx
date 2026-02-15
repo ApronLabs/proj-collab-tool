@@ -15,12 +15,9 @@ import Link from 'next/link';
 import type { IdeaDetail, IdeaComment as IdeaCommentType } from '@/lib/types';
 
 const STATUS_OPTIONS = [
-  { value: 'proposed', label: '제안됨' },
-  { value: 'discussing', label: '논의중' },
-  { value: 'approved', label: '승인됨' },
+  { value: 'proposed', label: '등록' },
   { value: 'in_progress', label: '진행중' },
   { value: 'done', label: '완료' },
-  { value: 'rejected', label: '거절됨' },
 ];
 
 export default function IdeaDetailPage({ params }: { params: Promise<{ id: string }> }) {

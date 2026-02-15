@@ -11,10 +11,9 @@ import type { BugListItem } from '@/lib/types';
 
 const STATUS_OPTIONS = [
   { value: '', label: '전체' },
-  { value: 'open', label: '열림' },
+  { value: 'open', label: '등록' },
   { value: 'in_progress', label: '진행중' },
-  { value: 'resolved', label: '해결됨' },
-  { value: 'closed', label: '닫힘' },
+  { value: 'resolved', label: '완료' },
 ];
 
 const PRIORITY_OPTIONS = [
@@ -30,7 +29,6 @@ const statusIcon = (status: string) => {
     case 'open': return <CircleDot className="h-4 w-4 text-green-500" />;
     case 'in_progress': return <CircleDot className="h-4 w-4 text-yellow-500" />;
     case 'resolved': return <CheckCircle2 className="h-4 w-4 text-purple-500" />;
-    case 'closed': return <CheckCircle2 className="h-4 w-4 text-gray-400" />;
     default: return <Circle className="h-4 w-4 text-gray-400" />;
   }
 };
