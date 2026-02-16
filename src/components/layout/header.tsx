@@ -8,7 +8,8 @@ import { useAuth } from '../auth-context';
 
 const NAV_ITEMS = [
   { href: '/bugs', label: '버그', icon: Bug },
-  { href: '/ideas', label: '추가 및 개선', icon: Settings2 },
+  { href: '/improvements', label: '추가 및 개선', icon: Settings2 },
+  { href: '/ideas', label: '아이디어', icon: Lightbulb },
   { href: '/qa', label: 'QA 테스트', icon: ClipboardCheck },
 ];
 

@@ -25,12 +25,15 @@ model User {
   updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
   // collab relations
-  bugsCreated      Bug[]           @relation("BugCreatedBy")
-  bugsAssigned     Bug[]           @relation("BugAssignedTo")
-  bugComments      BugComment[]
-  ideasCreated     Idea[]
-  ideaComments     IdeaComment[]
-  ideaVotes        IdeaVote[]
+  bugsCreated            Bug[]                  @relation("BugCreatedBy")
+  bugsAssigned           Bug[]                  @relation("BugAssignedTo")
+  bugComments            BugComment[]
+  ideasCreated           Idea[]
+  ideaComments           IdeaComment[]
+  ideaVotes              IdeaVote[]
+  improvementsCreated    Improvement[]          @relation("ImprovementCreatedBy")
+  improvementsAssigned   Improvement[]          @relation("ImprovementAssignedTo")
+  improvementComments    ImprovementComment[]
 
   @@map("users")
   @@schema("public")
@@ -210,5 +213,84 @@ model IdeaTagLink {
 
   @@unique([ideaId, tagId])
   @@map("idea_tag_links")
+  @@schema("collab")
+}
+
+// ============================================================================
+// Improvements (collab schema)
+// ============================================================================
+model Improvement {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  description String?  @db.Text
+  status      String   @default("open") // open, in_progress, resolved
+  priority    String   @default("medium") // low, medium, high, critical
+  repo        String?  // e.g. "ApronLabs/apronlabs-pwa"
+  createdById String   @map("created_by_id") @db.Uuid
+  assigneeId  String?  @map("assignee_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  createdBy   User                    @relation("ImprovementCreatedBy", fields: [createdById], references: [id])
+  assignee    User?                   @relation("ImprovementAssignedTo", fields: [assigneeId], references: [id])
+  comments    ImprovementComment[]
+  attachments ImprovementAttachment[]
+  githubLinks ImprovementGithubLink[]
+
+  @@index([status])
+  @@index([priority])
+  @@index([createdById])
+  @@map("improvements")
+  @@schema("collab")
+}
+
+model ImprovementComment {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  improvementId String   @map("improvement_id") @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  content       String   @db.Text
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  improvement Improvement @relation(fields: [improvementId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id])
+
+  @@index([improvementId])
+  @@map("improvement_comments")
+  @@schema("collab")
+}
+
+model ImprovementAttachment {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  improvementId String   @map("improvement_id") @db.Uuid
+  fileName      String   @map("file_name")
+  fileUrl       String   @map("file_url")
+  fileSize      Int?     @map("file_size")
+  mimeType      String?  @map("mime_type")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  improvement Improvement @relation(fields: [improvementId], references: [id], onDelete: Cascade)
+
+  @@index([improvementId])
+  @@map("improvement_attachments")
+  @@schema("collab")
+}
+
+model ImprovementGithubLink {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  improvementId String   @map("improvement_id") @db.Uuid
+  githubType    String   @map("github_type") // "issue" or "pr"
+  repo          String   // e.g. "ApronLabs/apronlabs-pwa"
+  number        Int      // GitHub issue/PR number
+  title         String?
+  url           String
+  state         String?  // open, closed, merged
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  improvement Improvement @relation(fields: [improvementId], references: [id], onDelete: Cascade)
+
+  @@unique([improvementId, repo, number])
+  @@index([improvementId])
+  @@map("improvement_github_links")
   @@schema("collab")
 }

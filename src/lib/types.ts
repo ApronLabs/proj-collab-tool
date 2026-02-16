@@ -111,6 +111,64 @@ export interface Tag {
   _count?: { ideaLinks: number };
 }
 
+export interface ImprovementListItem {
+  id: string;
+  title: string;
+  description: string | null;
+  status: string;
+  priority: string;
+  repo: string | null;
+  createdById: string;
+  assigneeId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: UserSummary;
+  assignee: UserSummary | null;
+  _count: {
+    comments: number;
+    attachments: number;
+    githubLinks: number;
+  };
+}
+
+export interface ImprovementComment {
+  id: string;
+  improvementId: string;
+  userId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  user: UserSummary;
+}
+
+export interface ImprovementAttachment {
+  id: string;
+  improvementId: string;
+  fileName: string;
+  fileUrl: string;
+  fileSize: number | null;
+  mimeType: string | null;
+  createdAt: string;
+}
+
+export interface ImprovementGithubLink {
+  id: string;
+  improvementId: string;
+  githubType: string;
+  repo: string;
+  number: number;
+  title: string | null;
+  url: string;
+  state: string | null;
+  createdAt: string;
+}
+
+export interface ImprovementDetail extends ImprovementListItem {
+  comments: ImprovementComment[];
+  attachments: ImprovementAttachment[];
+  githubLinks: ImprovementGithubLink[];
+}
+
 export interface GithubItem {
   id: number;
   number: number;
