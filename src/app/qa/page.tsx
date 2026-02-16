@@ -83,7 +83,7 @@ export default function CollabPage() {
           return (
             <button
               key={section.id}
-              onClick={() => router.push(`/collab/${section.id}`)}
+              onClick={() => router.push(`/qa/${section.id}`)}
               className="w-full text-left bg-white border border-gray-200 rounded-lg p-4 hover:border-brand active:bg-gray-50 transition-colors"
             >
               <div className="flex items-start justify-between gap-2 mb-2">

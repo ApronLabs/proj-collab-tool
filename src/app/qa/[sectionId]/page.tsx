@@ -36,7 +36,7 @@ export default function SectionDetailPage() {
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
         <p className="text-gray-500 mb-4">존재하지 않는 섹션입니다</p>
         <button
-          onClick={() => router.push("/collab")}
+          onClick={() => router.push("/qa")}
           className="text-brand text-sm font-medium"
         >
           목록으로 돌아가기
@@ -59,7 +59,7 @@ export default function SectionDetailPage() {
         <div className="px-4 py-3">
           <div className="flex items-center gap-2 mb-2">
             <button
-              onClick={() => router.push("/collab")}
+              onClick={() => router.push("/qa")}
               className="p-1 -ml-1 text-gray-500 hover:text-gray-900"
               aria-label="뒤로가기"
             >

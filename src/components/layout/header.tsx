@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bug, Lightbulb, ExternalLink } from 'lucide-react';
+import { Bug, Lightbulb, Settings2, ClipboardCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '../auth-context';
 
 const NAV_ITEMS = [
   { href: '/bugs', label: '버그', icon: Bug },
-  { href: '/ideas', label: '아이디어', icon: Lightbulb },
+  { href: '/ideas', label: '추가 및 개선', icon: Settings2 },
+  { href: '/qa', label: 'QA 테스트', icon: ClipboardCheck },
 ];
 
 export function Header() {
