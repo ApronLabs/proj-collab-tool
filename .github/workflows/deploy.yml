@@ -25,9 +25,8 @@ jobs:
             cd /home/ubuntu/proj-collab-tool
             git checkout -- .
             git pull origin main
+            rm -rf .next
             npm install
             npx prisma generate --schema=prisma/schema.prisma
-            npm run build
-            npm prune --omit=dev
-            pm2 restart collab-tool || pm2 start npm --name "collab-tool" -- start -- -p 4000
+            npm run build && npm prune --omit=dev && (pm2 restart collab-tool || pm2 start npm --name "collab-tool" -- start -- -p 4000)
           ENDSSH
