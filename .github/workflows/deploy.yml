@@ -23,9 +23,9 @@ jobs:
 
           ssh -i ~/.ssh/deploy_key $EC2_USER@$EC2_HOST << 'ENDSSH'
             cd /home/ubuntu/proj-collab-tool
-            git checkout -- .
+            git fetch origin
+            git reset --hard origin/main
             git clean -fd -e .env -e node_modules
-            git pull origin main
             rm -rf .next
             npm install
             npx prisma generate --schema=prisma/schema.prisma
