@@ -29,6 +29,6 @@ jobs:
             rm -rf .next
             npm install
             npx prisma generate
-            npx prisma db push --accept-data-loss
+            node prisma/run-migration.js
             NODE_OPTIONS="--max-old-space-size=512" npm run build && npm prune --omit=dev && (pm2 restart collab-tool || pm2 start npm --name "collab-tool" -- start -- -p 4000)
           ENDSSH
