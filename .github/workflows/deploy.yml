@@ -28,7 +28,7 @@ jobs:
             git clean -fd -e .env -e node_modules
             rm -rf .next
             npm install
-            npx prisma generate --schema=prisma/schema.prisma
-            npx prisma db push --schema=prisma/schema.prisma --accept-data-loss
+            npx prisma generate
+            npx prisma db push --accept-data-loss
             NODE_OPTIONS="--max-old-space-size=512" npm run build && npm prune --omit=dev && (pm2 restart collab-tool || pm2 start npm --name "collab-tool" -- start -- -p 4000)
           ENDSSH
