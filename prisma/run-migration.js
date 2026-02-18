@@ -33,11 +33,20 @@ async function main() {
     ssl: { rejectUnauthorized: false },
   });
 
-  const sql = readFileSync('prisma/create_improvements.sql', 'utf8');
+  const sqlFiles = [
+    'prisma/create_improvements.sql',
+    'prisma/create_screen_references.sql',
+  ];
 
   try {
-    await pool.query(sql);
-    console.log('✔ Improvements tables created/verified');
+    for (const file of sqlFiles) {
+      if (existsSync(file)) {
+        const sql = readFileSync(file, 'utf8');
+        await pool.query(sql);
+        console.log(`✔ ${file} executed`);
+      }
+    }
+    console.log('✔ All migrations completed');
   } catch (err) {
     console.error('Migration error:', err.message);
   } finally {

@@ -22,6 +22,11 @@ jobs:
           ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
 
           ssh -i ~/.ssh/deploy_key $EC2_USER@$EC2_HOST << 'ENDSSH'
+            # Chromium 설치 (puppeteer 스크린샷 캡처용, 이미 설치되어 있으면 스킵)
+            if ! command -v chromium-browser &>/dev/null && ! command -v chromium &>/dev/null; then
+              sudo apt-get update -y && sudo apt-get install -y chromium-browser
+            fi
+
             cd /home/ubuntu/proj-collab-tool
             git fetch origin
             git reset --hard origin/main

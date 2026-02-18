@@ -7,10 +7,12 @@ import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { ArrowLeft, Send, Github, Trash2, ExternalLink } from 'lucide-react';
 import { useBug, useUpdateBug, useDeleteBug, useAddBugComment, useUploadBugAttachment, useAddBugYoutubeLink, useDeleteBugAttachment, useUnlinkBugGithub } from '@/lib/hooks/use-bugs';
+import { useScreenReferences } from '@/lib/hooks/use-screen-references';
 import { Button, Card, Input } from '@/components/ui';
 import { useAuth } from '@/components/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MediaSection } from '@/components/media/media-section';
+import { FlowViewer } from '@/components/screen-ref/flow-viewer';
 import Link from 'next/link';
 import type { BugDetail, BugComment as BugCommentType, BugGithubLink } from '@/lib/types';
 
@@ -39,6 +41,7 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
   const addYoutubeLink = useAddBugYoutubeLink();
   const deleteAttachment = useDeleteBugAttachment();
   const unlinkGithub = useUnlinkBugGithub();
+  const { data: screenRefs } = useScreenReferences('bug', id);
 
   const [comment, setComment] = useState('');
 
@@ -174,6 +177,13 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
       {bug.description && (
         <Card>
           <p className="text-sm text-gray-700 whitespace-pre-wrap">{bug.description}</p>
+        </Card>
+      )}
+
+      {/* Screen References / Flow */}
+      {screenRefs && screenRefs.length > 0 && (
+        <Card>
+          <FlowViewer screenRefs={screenRefs} />
         </Card>
       )}
 

@@ -4,10 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useCreateBug, useUploadBugAttachment, useAddBugYoutubeLink } from '@/lib/hooks/use-bugs';
+import { useCreateScreenReference } from '@/lib/hooks/use-screen-references';
 import { useCreateGithubIssue } from '@/lib/hooks/use-github';
 import { Button, Input, Card } from '@/components/ui';
 import { Textarea } from '@/components/ui/textarea';
 import { MediaPicker, type PendingFile, type PendingYoutube } from '@/components/media/media-picker';
+import { FlowEditor } from '@/components/screen-ref/flow-editor';
+import { Monitor } from 'lucide-react';
+import type { PendingScreenRef } from '@/lib/types';
 
 const REPOS = ['ApronLabs/apronlabs-pwa', 'ApronLabs/barcode-scanner'];
 const PRIORITIES = [
@@ -23,6 +27,7 @@ export default function NewBugPage() {
   const uploadAttachment = useUploadBugAttachment();
   const addYoutubeLink = useAddBugYoutubeLink();
   const createGithubIssue = useCreateGithubIssue();
+  const createScreenRef = useCreateScreenReference();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -31,6 +36,8 @@ export default function NewBugPage() {
   const [createGithub, setCreateGithub] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
   const [pendingYoutubeLinks, setPendingYoutubeLinks] = useState<PendingYoutube[]>([]);
+  const [screenRefSteps, setScreenRefSteps] = useState<PendingScreenRef[]>([]);
+  const [showScreenRef, setShowScreenRef] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,10 +48,23 @@ export default function NewBugPage() {
     try {
       const bug = await createBug.mutateAsync({ title, description, priority, repo });
 
-      // Upload files and YouTube links
+      // Upload files, YouTube links, and screen references in parallel
       await Promise.all([
         ...pendingFiles.map((f) => uploadAttachment.mutateAsync({ bugId: bug.id, file: f.file })),
         ...pendingYoutubeLinks.map((yt) => addYoutubeLink.mutateAsync({ bugId: bug.id, youtubeUrl: yt.url })),
+        ...screenRefSteps
+          .filter((s) => s.pageId)
+          .map((s) =>
+            createScreenRef.mutateAsync({
+              entityType: 'bug',
+              entityId: bug.id,
+              stepOrder: s.stepOrder,
+              pageId: s.pageId,
+              screenshotUrl: s.screenshotUrl,
+              annotations: s.annotations.length > 0 ? s.annotations : undefined,
+              description: s.description,
+            })
+          ),
       ]);
 
       if (createGithub && repo) {
@@ -96,6 +116,36 @@ export default function NewBugPage() {
               onAddYoutube={(link) => setPendingYoutubeLinks((prev) => [...prev, link])}
               onRemoveYoutube={(i) => setPendingYoutubeLinks((prev) => prev.filter((_, idx) => idx !== i))}
             />
+          </div>
+
+          {/* Screen Reference Section */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-sm font-medium text-gray-700">화면 참조 / 재현 플로우</label>
+              <Button
+                type="button"
+                variant={showScreenRef ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => {
+                  setShowScreenRef(!showScreenRef);
+                  if (!showScreenRef && screenRefSteps.length === 0) {
+                    setScreenRefSteps([{
+                      pageId: '',
+                      stepOrder: 0,
+                      screenshotUrl: null,
+                      annotations: [],
+                      description: '',
+                    }]);
+                  }
+                }}
+              >
+                <Monitor className="h-4 w-4" />
+                {showScreenRef ? '접기' : '화면 참조 추가'}
+              </Button>
+            </div>
+            {showScreenRef && (
+              <FlowEditor steps={screenRefSteps} onChange={setScreenRefSteps} />
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">

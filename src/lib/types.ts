@@ -169,6 +169,41 @@ export interface ImprovementDetail extends ImprovementListItem {
   githubLinks: ImprovementGithubLink[];
 }
 
+// ============================================================================
+// Screen Reference + Annotation types
+// ============================================================================
+
+export type AnnotationType = 'arrow' | 'circle' | 'rect' | 'text';
+
+export interface Annotation {
+  id: string;
+  type: AnnotationType;
+  x: number;
+  y: number;
+  color: string;
+  props: Record<string, number | string>;
+}
+
+export interface ScreenReferenceData {
+  id: string;
+  entityType: string;
+  entityId: string;
+  stepOrder: number;
+  pageId: string;
+  screenshotUrl: string | null;
+  annotations: string | null; // JSON string of Annotation[]
+  description: string | null;
+  createdAt: string;
+}
+
+export interface PendingScreenRef {
+  pageId: string;
+  stepOrder: number;
+  screenshotUrl: string | null;
+  annotations: Annotation[];
+  description: string;
+}
+
 export interface GithubItem {
   id: number;
   number: number;

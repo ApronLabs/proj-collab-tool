@@ -276,6 +276,26 @@ model ImprovementAttachment {
   @@schema("collab")
 }
 
+// ============================================================================
+// Screen References (collab schema)
+// ============================================================================
+model ScreenReference {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  entityType    String   @map("entity_type")
+  entityId      String   @map("entity_id") @db.Uuid
+  stepOrder     Int      @map("step_order") @default(0)
+  pageId        String   @map("page_id")
+  screenshotUrl String?  @map("screenshot_url")
+  annotations   String?  @db.Text
+  description   String?  @db.Text
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@index([entityType, entityId])
+  @@index([entityId, stepOrder])
+  @@map("screen_references")
+  @@schema("collab")
+}
+
 model ImprovementGithubLink {
   id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   improvementId String   @map("improvement_id") @db.Uuid

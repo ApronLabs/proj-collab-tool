@@ -7,10 +7,12 @@ import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { ArrowLeft, Send, Github, Trash2, ExternalLink } from 'lucide-react';
 import { useImprovement, useUpdateImprovement, useDeleteImprovement, useAddImprovementComment, useUploadImprovementAttachment, useAddImprovementYoutubeLink, useDeleteImprovementAttachment, useUnlinkImprovementGithub } from '@/lib/hooks/use-improvements';
+import { useScreenReferences } from '@/lib/hooks/use-screen-references';
 import { Button, Card, Input } from '@/components/ui';
 import { useAuth } from '@/components/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MediaSection } from '@/components/media/media-section';
+import { FlowViewer } from '@/components/screen-ref/flow-viewer';
 import Link from 'next/link';
 import type { ImprovementDetail, ImprovementComment as ImprovementCommentType, ImprovementGithubLink } from '@/lib/types';
 
@@ -39,6 +41,7 @@ export default function ImprovementDetailPage({ params }: { params: Promise<{ id
   const addYoutubeLink = useAddImprovementYoutubeLink();
   const deleteAttachment = useDeleteImprovementAttachment();
   const unlinkGithub = useUnlinkImprovementGithub();
+  const { data: screenRefs } = useScreenReferences('improvement', id);
 
   const [comment, setComment] = useState('');
 
@@ -174,6 +177,13 @@ export default function ImprovementDetailPage({ params }: { params: Promise<{ id
       {improvement.description && (
         <Card>
           <p className="text-sm text-gray-700 whitespace-pre-wrap">{improvement.description}</p>
+        </Card>
+      )}
+
+      {/* Screen References / Flow */}
+      {screenRefs && screenRefs.length > 0 && (
+        <Card>
+          <FlowViewer screenRefs={screenRefs} />
         </Card>
       )}
 
