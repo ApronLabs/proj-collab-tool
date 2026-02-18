@@ -34,20 +34,23 @@ export async function POST(request: NextRequest) {
     // Dynamic import to avoid bundling issues
     const puppeteer = await import('puppeteer-core');
 
-    // Find chromium executable
-    const execPaths = [
-      '/usr/bin/chromium-browser',
-      '/usr/bin/chromium',
-      '/usr/bin/google-chrome',
-      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    ];
+    // Find chromium executable (env override or auto-detect)
+    let executablePath = process.env.CHROMIUM_PATH || '';
 
-    let executablePath = '';
-    const { existsSync } = await import('fs');
-    for (const p of execPaths) {
-      if (existsSync(p)) {
-        executablePath = p;
-        break;
+    if (!executablePath) {
+      const candidates = [
+        '/snap/bin/chromium',
+        '/usr/bin/chromium-browser',
+        '/usr/bin/chromium',
+        '/usr/bin/google-chrome',
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      ];
+      const { existsSync } = await import('fs');
+      for (const p of candidates) {
+        if (existsSync(p)) {
+          executablePath = p;
+          break;
+        }
       }
     }
 
