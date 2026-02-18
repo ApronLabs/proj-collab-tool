@@ -46,7 +46,7 @@ model Bug {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title       String
   description String?   @db.Text
-  status      String    @default("open") // open, in_progress, resolved
+  status      String    @default("open") // open, in_progress, on_hold, re_request, resolved
   priority    String    @default("medium") // low, medium, high, critical
   repo        String?   // e.g. "ApronLabs/apronlabs-pwa"
   createdById String    @map("created_by_id") @db.Uuid
@@ -126,7 +126,7 @@ model Idea {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title       String
   description String?  @db.Text
-  status      String   @default("proposed") // proposed, in_progress, done
+  status      String   @default("proposed") // proposed, in_progress, on_hold, re_request, done
   createdById String   @map("created_by_id") @db.Uuid
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
@@ -224,7 +224,7 @@ model Improvement {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title       String
   description String?   @db.Text
-  status      String    @default("open") // open, in_progress, resolved
+  status      String    @default("open") // open, in_progress, on_hold, re_request, resolved
   priority    String    @default("medium") // low, medium, high, critical
   repo        String?   // e.g. "ApronLabs/apronlabs-pwa"
   createdById String    @map("created_by_id") @db.Uuid

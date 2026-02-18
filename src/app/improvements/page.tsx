@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Plus, CircleDot, CheckCircle2, Circle, MessageSquare, Paperclip, Github } from 'lucide-react';
+import { Plus, CircleDot, CheckCircle2, Circle, PauseCircle, RotateCcw, MessageSquare, Paperclip, Github } from 'lucide-react';
 import { useImprovements } from '@/lib/hooks/use-improvements';
 import { Button, Card, SkeletonList } from '@/components/ui';
 import { format } from 'date-fns';
@@ -13,6 +13,8 @@ const STATUS_OPTIONS = [
   { value: '', label: '전체' },
   { value: 'open', label: '등록' },
   { value: 'in_progress', label: '진행중' },
+  { value: 'on_hold', label: '보류' },
+  { value: 're_request', label: '재요청' },
   { value: 'resolved', label: '완료' },
 ];
 
@@ -27,6 +29,8 @@ const PRIORITY_OPTIONS = [
 const STATUS_MAP: Record<string, { icon: typeof CircleDot; text: string; color: string }> = {
   open: { icon: CircleDot, text: '등록', color: 'text-green-600 bg-green-50' },
   in_progress: { icon: CircleDot, text: '진행중', color: 'text-yellow-600 bg-yellow-50' },
+  on_hold: { icon: PauseCircle, text: '보류', color: 'text-orange-600 bg-orange-50' },
+  re_request: { icon: RotateCcw, text: '재요청', color: 'text-red-600 bg-red-50' },
   resolved: { icon: CheckCircle2, text: '완료', color: 'text-purple-600 bg-purple-50' },
 };
 

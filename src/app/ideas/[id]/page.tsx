@@ -17,6 +17,8 @@ import type { IdeaDetail, IdeaComment as IdeaCommentType } from '@/lib/types';
 const STATUS_OPTIONS = [
   { value: 'proposed', label: '등록' },
   { value: 'in_progress', label: '진행중' },
+  { value: 'on_hold', label: '보류' },
+  { value: 're_request', label: '재요청' },
   { value: 'done', label: '완료' },
 ];
 

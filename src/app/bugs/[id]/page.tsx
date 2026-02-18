@@ -19,6 +19,8 @@ import type { BugDetail, BugComment as BugCommentType, BugGithubLink } from '@/l
 const STATUS_OPTIONS = [
   { value: 'open', label: '등록' },
   { value: 'in_progress', label: '진행중' },
+  { value: 'on_hold', label: '보류' },
+  { value: 're_request', label: '재요청' },
   { value: 'resolved', label: '완료' },
 ];
 
