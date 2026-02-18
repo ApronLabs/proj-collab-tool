@@ -43,16 +43,17 @@ model User {
 // Bug Tracker (collab schema)
 // ============================================================================
 model Bug {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title       String
-  description String?  @db.Text
-  status      String   @default("open") // open, in_progress, resolved
-  priority    String   @default("medium") // low, medium, high, critical
-  repo        String?  // e.g. "ApronLabs/apronlabs-pwa"
-  createdById String   @map("created_by_id") @db.Uuid
-  assigneeId  String?  @map("assignee_id") @db.Uuid
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+  description String?   @db.Text
+  status      String    @default("open") // open, in_progress, resolved
+  priority    String    @default("medium") // low, medium, high, critical
+  repo        String?   // e.g. "ApronLabs/apronlabs-pwa"
+  createdById String    @map("created_by_id") @db.Uuid
+  assigneeId  String?   @map("assignee_id") @db.Uuid
+  resolvedAt  DateTime? @map("resolved_at") @db.Timestamptz()
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
   createdBy   User          @relation("BugCreatedBy", fields: [createdById], references: [id])
   assignee    User?         @relation("BugAssignedTo", fields: [assigneeId], references: [id])
@@ -220,16 +221,17 @@ model IdeaTagLink {
 // Improvements (collab schema)
 // ============================================================================
 model Improvement {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title       String
-  description String?  @db.Text
-  status      String   @default("open") // open, in_progress, resolved
-  priority    String   @default("medium") // low, medium, high, critical
-  repo        String?  // e.g. "ApronLabs/apronlabs-pwa"
-  createdById String   @map("created_by_id") @db.Uuid
-  assigneeId  String?  @map("assignee_id") @db.Uuid
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+  description String?   @db.Text
+  status      String    @default("open") // open, in_progress, resolved
+  priority    String    @default("medium") // low, medium, high, critical
+  repo        String?   // e.g. "ApronLabs/apronlabs-pwa"
+  createdById String    @map("created_by_id") @db.Uuid
+  assigneeId  String?   @map("assignee_id") @db.Uuid
+  resolvedAt  DateTime? @map("resolved_at") @db.Timestamptz()
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
   createdBy   User                    @relation("ImprovementCreatedBy", fields: [createdById], references: [id])
   assignee    User?                   @relation("ImprovementAssignedTo", fields: [assigneeId], references: [id])

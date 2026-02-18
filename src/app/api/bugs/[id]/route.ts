@@ -36,7 +36,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const data: Record<string, unknown> = {};
   if (title !== undefined) data.title = title.trim();
   if (description !== undefined) data.description = description?.trim() || null;
-  if (status !== undefined) data.status = status;
+  if (status !== undefined) {
+    data.status = status;
+    if (status === 'resolved') {
+      data.resolvedAt = new Date();
+    } else {
+      data.resolvedAt = null;
+    }
+  }
   if (priority !== undefined) data.priority = priority;
   if (repo !== undefined) data.repo = repo || null;
   if (assigneeId !== undefined) data.assigneeId = assigneeId || null;

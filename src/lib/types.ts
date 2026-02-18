@@ -13,6 +13,7 @@ export interface BugListItem {
   repo: string | null;
   createdById: string;
   assigneeId: string | null;
+  resolvedAt: string | null;
   createdAt: string;
   updatedAt: string;
   createdBy: UserSummary;
@@ -120,6 +121,7 @@ export interface ImprovementListItem {
   repo: string | null;
   createdById: string;
   assigneeId: string | null;
+  resolvedAt: string | null;
   createdAt: string;
   updatedAt: string;
   createdBy: UserSummary;

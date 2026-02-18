@@ -36,6 +36,7 @@ async function main() {
   const sqlFiles = [
     'prisma/create_improvements.sql',
     'prisma/create_screen_references.sql',
+    'prisma/add_resolved_at.sql',
   ];
 
   try {
