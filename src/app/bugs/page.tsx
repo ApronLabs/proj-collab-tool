@@ -24,13 +24,20 @@ const PRIORITY_OPTIONS = [
   { value: 'low', label: '낮음' },
 ];
 
-const statusIcon = (status: string) => {
-  switch (status) {
-    case 'open': return <CircleDot className="h-4 w-4 text-green-500" />;
-    case 'in_progress': return <CircleDot className="h-4 w-4 text-yellow-500" />;
-    case 'resolved': return <CheckCircle2 className="h-4 w-4 text-purple-500" />;
-    default: return <Circle className="h-4 w-4 text-gray-400" />;
-  }
+const statusBadge = (status: string) => {
+  const map: Record<string, { icon: typeof CircleDot; text: string; color: string }> = {
+    open: { icon: CircleDot, text: '등록', color: 'text-green-600 bg-green-50' },
+    in_progress: { icon: CircleDot, text: '진행중', color: 'text-yellow-600 bg-yellow-50' },
+    resolved: { icon: CheckCircle2, text: '완료', color: 'text-purple-600 bg-purple-50' },
+  };
+  const s = map[status] || { icon: Circle, text: status, color: 'text-gray-500 bg-gray-100' };
+  const Icon = s.icon;
+  return (
+    <span className={`inline-flex items-center gap-1 text-2xs px-1.5 py-0.5 rounded font-medium shrink-0 ${s.color}`}>
+      <Icon className="h-3 w-3" />
+      {s.text}
+    </span>
+  );
 };
 
 const priorityLabel = (p: string) => {
@@ -111,10 +118,10 @@ export default function BugsPage() {
 
             return (
               <Link key={bug.id} href={`/bugs/${bug.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
-                {statusIcon(bug.status)}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-gray-900 truncate">{bug.title}</span>
+                    {statusBadge(bug.status)}
                     <span className={`text-2xs px-1.5 py-0.5 rounded font-medium shrink-0 ${pl.color}`}>{pl.text}</span>
                   </div>
                   <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-500">
