@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Plus, CircleDot, CheckCircle2, Circle, MessageSquare, Paperclip } from 'lucide-react';
+import { Plus, CircleDot, CheckCircle2, Circle, MessageSquare, Paperclip, Github } from 'lucide-react';
 import { useBugs } from '@/lib/hooks/use-bugs';
 import { Button, Card, SkeletonList } from '@/components/ui';
 import { format } from 'date-fns';
@@ -120,42 +120,62 @@ export default function BugsPage() {
             const StatusIcon = sl.icon;
 
             return (
-              <Link key={bug.id} href={`/bugs/${bug.id}`} className="block px-4 py-3 hover:bg-gray-50 transition-colors">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="text-sm font-medium text-gray-900">{bug.title}</span>
-                  <div className="flex items-center gap-3 shrink-0 text-xs text-gray-400">
-                    {bug._count?.comments > 0 && (
-                      <span className="flex items-center gap-1">
-                        <MessageSquare className="h-3.5 w-3.5" />
-                        {bug._count.comments}
-                      </span>
-                    )}
-                    {bug._count?.attachments > 0 && (
-                      <span className="flex items-center gap-1">
-                        <Paperclip className="h-3.5 w-3.5" />
-                        {bug._count.attachments}
-                      </span>
-                    )}
+              <div key={bug.id} className="px-4 py-3 hover:bg-gray-50 transition-colors">
+                <Link href={`/bugs/${bug.id}`} className="block">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="text-sm font-medium text-gray-900">{bug.title}</span>
+                    <div className="flex items-center gap-3 shrink-0 text-xs text-gray-400">
+                      {bug._count?.comments > 0 && (
+                        <span className="flex items-center gap-1">
+                          <MessageSquare className="h-3.5 w-3.5" />
+                          {bug._count.comments}
+                        </span>
+                      )}
+                      {bug._count?.attachments > 0 && (
+                        <span className="flex items-center gap-1">
+                          <Paperclip className="h-3.5 w-3.5" />
+                          {bug._count.attachments}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs text-gray-500">
-                  <span className="flex items-center gap-1">
-                    진행상태:
-                    <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded font-medium ${sl.color}`}>
-                      <StatusIcon className="h-3 w-3" />{sl.text}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs text-gray-500">
+                    <span className="flex items-center gap-1">
+                      진행상태:
+                      <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded font-medium ${sl.color}`}>
+                        <StatusIcon className="h-3 w-3" />{sl.text}
+                      </span>
                     </span>
-                  </span>
-                  <span className="flex items-center gap-1">
-                    우선순위:
-                    <span className={`inline-flex px-1.5 py-0.5 rounded font-medium ${pl.color}`}>{pl.text}</span>
-                  </span>
-                  <span>등록: {formatDate(bug.createdAt)}</span>
-                  {bug.resolvedAt && (
-                    <span>완료: {formatDate(bug.resolvedAt)}</span>
-                  )}
-                  <span className="text-gray-400">{bug.createdBy?.name}</span>
-                </div>
-              </Link>
+                    <span className="flex items-center gap-1">
+                      우선순위:
+                      <span className={`inline-flex px-1.5 py-0.5 rounded font-medium ${pl.color}`}>{pl.text}</span>
+                    </span>
+                    <span>등록: {formatDate(bug.createdAt)}</span>
+                    {bug.resolvedAt && (
+                      <span>완료: {formatDate(bug.resolvedAt)}</span>
+                    )}
+                    <span className="text-gray-400">{bug.createdBy?.name}</span>
+                  </div>
+                </Link>
+                {/* GitHub Links */}
+                {bug.githubLinks?.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {bug.githubLinks.map((link) => (
+                      <a
+                        key={link.id}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-md bg-gray-900 text-white hover:bg-gray-700 transition-colors"
+                      >
+                        <Github className="h-3 w-3" />
+                        {link.githubType === 'pr' ? 'PR' : 'Issue'} #{link.number}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>

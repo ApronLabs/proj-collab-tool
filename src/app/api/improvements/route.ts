@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
     include: {
       createdBy: { select: { id: true, name: true, avatarUrl: true } },
       assignee: { select: { id: true, name: true, avatarUrl: true } },
+      githubLinks: { select: { id: true, githubType: true, number: true, title: true, url: true, state: true }, orderBy: { createdAt: 'desc' } },
       _count: { select: { comments: true, attachments: true, githubLinks: true } },
     },
     orderBy: { createdAt: 'desc' },

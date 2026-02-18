@@ -4,6 +4,15 @@ export interface UserSummary {
   avatarUrl: string | null;
 }
 
+export interface GithubLinkSummary {
+  id: string;
+  githubType: string;
+  number: number;
+  title: string | null;
+  url: string;
+  state: string | null;
+}
+
 export interface BugListItem {
   id: string;
   title: string;
@@ -18,6 +27,7 @@ export interface BugListItem {
   updatedAt: string;
   createdBy: UserSummary;
   assignee: UserSummary | null;
+  githubLinks: GithubLinkSummary[];
   _count: {
     comments: number;
     attachments: number;
@@ -126,6 +136,7 @@ export interface ImprovementListItem {
   updatedAt: string;
   createdBy: UserSummary;
   assignee: UserSummary | null;
+  githubLinks: GithubLinkSummary[];
   _count: {
     comments: number;
     attachments: number;

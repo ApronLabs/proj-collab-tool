@@ -33,10 +33,20 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get(COOKIE_NAME)?.value;
   const userId = token ? await verifyToken(token) : null;
 
+  // Already authenticated user on login page → redirect to bugs
+  if (userId && isPublicRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/collab/bugs";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
   // Unauthenticated access to protected page
   if (!userId && !isPublicRoute) {
     const url = request.nextUrl.clone();
+    const redirectTo = path;
     url.pathname = "/collab/not-authenticated";
+    url.search = `?redirect=${encodeURIComponent(redirectTo)}`;
     return NextResponse.redirect(url);
   }
 
