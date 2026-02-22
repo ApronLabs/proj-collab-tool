@@ -43,6 +43,16 @@ const priorityLabel = (p: string) => {
   return map[p] || { text: p, color: 'text-gray-500 bg-gray-100' };
 };
 
+const devStatusBadge = (s: string | null) => {
+  if (!s) return null;
+  const map: Record<string, { text: string; color: string }> = {
+    in_progress: { text: '진행중', color: 'text-yellow-700 bg-yellow-50' },
+    pr_submitted: { text: 'PR개발중', color: 'text-blue-700 bg-blue-50' },
+    done: { text: '완료', color: 'text-green-700 bg-green-50' },
+  };
+  return map[s] || null;
+};
+
 export default function BugsPage() {
   const [status, setStatus] = useState('');
   const [priority, setPriority] = useState('');
@@ -108,6 +118,7 @@ export default function BugsPage() {
         <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
           {(bugs as BugListItem[]).map((bug) => {
             const pl = priorityLabel(bug.priority);
+            const ds = devStatusBadge(bug.devStatus);
 
             return (
               <Link key={bug.id} href={`/bugs/${bug.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
@@ -116,6 +127,7 @@ export default function BugsPage() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-gray-900 truncate">{bug.title}</span>
                     <span className={`text-2xs px-1.5 py-0.5 rounded font-medium shrink-0 ${pl.color}`}>{pl.text}</span>
+                    {ds && <span className={`text-2xs px-1.5 py-0.5 rounded font-medium shrink-0 ${ds.color}`}>{ds.text}</span>}
                   </div>
                   <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-500">
                     <span>{bug.createdBy?.name}</span>

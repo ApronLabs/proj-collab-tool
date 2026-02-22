@@ -10,6 +10,7 @@ export interface BugListItem {
   description: string | null;
   status: string;
   priority: string;
+  devStatus: string | null;
   repo: string | null;
   createdById: string;
   assigneeId: string | null;
@@ -67,6 +68,7 @@ export interface IdeaListItem {
   title: string;
   description: string | null;
   status: string;
+  devStatus: string | null;
   createdById: string;
   createdAt: string;
   updatedAt: string;
@@ -117,6 +119,7 @@ export interface ImprovementListItem {
   description: string | null;
   status: string;
   priority: string;
+  devStatus: string | null;
   repo: string | null;
   createdById: string;
   assigneeId: string | null;
