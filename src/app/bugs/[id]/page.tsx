@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { ArrowLeft, Send, Github, Trash2, ExternalLink } from 'lucide-react';
+import { Send, Github, Trash2, ExternalLink } from 'lucide-react';
 import { useBug, useUpdateBug, useDeleteBug, useAddBugComment, useUploadBugAttachment, useAddBugYoutubeLink, useDeleteBugAttachment, useUnlinkBugGithub } from '@/lib/hooks/use-bugs';
 import { Button, Card, Input } from '@/components/ui';
 import { useAuth } from '@/components/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MediaSection } from '@/components/media/media-section';
-import Link from 'next/link';
+import { BackButton } from '@/components/BackButton';
 import type { BugDetail, BugComment as BugCommentType, BugGithubLink } from '@/lib/types';
 
 const STATUS_OPTIONS = [
@@ -117,9 +117,13 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
     <div className="max-w-3xl mx-auto space-y-4">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <Link href="/bugs">
-          <Button variant="ghost" size="icon-sm"><ArrowLeft className="h-4 w-4" /></Button>
-        </Link>
+        <BackButton
+          fallbackPath="/bugs"
+          label="목록으로"
+          className="inline-flex items-center justify-center h-8 w-8 rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+        >
+          ←
+        </BackButton>
         <h1 className="text-lg font-bold text-gray-900 flex-1 truncate">{bug.title}</h1>
         {user?.id === bug.createdBy.id && (
           <Button variant="ghost" size="icon-sm" onClick={handleDelete}>
