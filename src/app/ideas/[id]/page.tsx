@@ -1,17 +1,16 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { ArrowLeft, ThumbsUp, Send, Trash2 } from 'lucide-react';
+import { ArrowLeft, ThumbsUp, Send, Trash2, Pencil } from 'lucide-react';
 import { useIdea, useUpdateIdea, useDeleteIdea, useAddIdeaComment, useToggleVote, useUploadIdeaAttachment, useAddIdeaYoutubeLink, useDeleteIdeaAttachment } from '@/lib/hooks/use-ideas';
 import { Button, Card, Input } from '@/components/ui';
 import { useAuth } from '@/components/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MediaSection } from '@/components/media/media-section';
-import Link from 'next/link';
 import type { IdeaDetail, IdeaComment as IdeaCommentType } from '@/lib/types';
 
 const STATUS_OPTIONS = [
@@ -36,6 +35,41 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
   const deleteAttachment = useDeleteIdeaAttachment();
 
   const [comment, setComment] = useState('');
+  const [editing, setEditing] = useState(false);
+  const [titleDraft, setTitleDraft] = useState('');
+  const [descDraft, setDescDraft] = useState('');
+
+  const isOwner = user?.id === idea?.createdBy?.id;
+
+  useEffect(() => {
+    if (idea) {
+      setTitleDraft(idea.title);
+      setDescDraft(idea.description || '');
+    }
+  }, [idea]);
+
+  const startEditing = () => {
+    setTitleDraft(idea?.title || '');
+    setDescDraft(idea?.description || '');
+    setEditing(true);
+  };
+
+  const cancelEditing = () => {
+    setTitleDraft(idea?.title || '');
+    setDescDraft(idea?.description || '');
+    setEditing(false);
+  };
+
+  const saveEditing = async () => {
+    const data: Record<string, string> = {};
+    if (titleDraft.trim() && titleDraft !== idea?.title) data.title = titleDraft.trim();
+    if (descDraft !== (idea?.description || '')) data.description = descDraft;
+    if (Object.keys(data).length > 0) {
+      await updateIdea.mutateAsync({ id, ...data });
+      toast.success('수정되었습니다');
+    }
+    setEditing(false);
+  };
 
   if (isLoading) {
     return (
@@ -111,11 +145,16 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
     <div className="max-w-3xl mx-auto space-y-4">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <Link href="/ideas">
-          <Button variant="ghost" size="icon-sm"><ArrowLeft className="h-4 w-4" /></Button>
-        </Link>
+        <Button variant="ghost" size="icon-sm" onClick={() => router.back()}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <h1 className="text-lg font-bold text-gray-900 flex-1 truncate">{idea.title}</h1>
-        {user?.id === idea.createdBy.id && (
+        {isOwner && !editing && (
+          <Button variant="ghost" size="icon-sm" onClick={startEditing}>
+            <Pencil className="h-3.5 w-3.5 text-gray-400" />
+          </Button>
+        )}
+        {isOwner && (
           <Button variant="ghost" size="icon-sm" onClick={handleDelete}>
             <Trash2 className="h-4 w-4 text-error" />
           </Button>
@@ -171,8 +210,37 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
         )}
       </Card>
 
-      {/* Description */}
-      {idea.description && (
+      {/* Editing Mode */}
+      {editing && (
+        <Card>
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">제목</label>
+              <input
+                className="w-full text-sm font-medium border border-gray-200 rounded-md px-3 py-2 outline-none focus:border-brand"
+                value={titleDraft}
+                onChange={(e) => setTitleDraft(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">설명</label>
+              <textarea
+                className="w-full text-sm border border-gray-200 rounded-md px-3 py-2 outline-none focus:border-brand min-h-[80px] resize-y"
+                value={descDraft}
+                onChange={(e) => setDescDraft(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={cancelEditing}>취소</Button>
+              <Button size="sm" onClick={saveEditing} isLoading={updateIdea.isPending}>저장</Button>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* Description (view mode) */}
+      {!editing && idea.description && (
         <Card>
           <p className="text-sm text-gray-700 whitespace-pre-wrap">{idea.description}</p>
         </Card>
