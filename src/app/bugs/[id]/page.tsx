@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { ArrowLeft, Send, Github, Trash2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Send, Github, Trash2, ExternalLink, Pencil } from 'lucide-react';
 import { useBug, useUpdateBug, useDeleteBug, useAddBugComment, useUploadBugAttachment, useAddBugYoutubeLink, useDeleteBugAttachment, useUnlinkBugGithub } from '@/lib/hooks/use-bugs';
 import { useScreenReferences } from '@/lib/hooks/use-screen-references';
 import { Button, Card, Input } from '@/components/ui';
@@ -13,7 +13,6 @@ import { useAuth } from '@/components/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MediaSection } from '@/components/media/media-section';
 import { FlowViewer } from '@/components/screen-ref/flow-viewer';
-import Link from 'next/link';
 import type { BugDetail, BugComment as BugCommentType, BugGithubLink } from '@/lib/types';
 
 const STATUS_OPTIONS = [
@@ -46,6 +45,41 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
   const { data: screenRefs } = useScreenReferences('bug', id);
 
   const [comment, setComment] = useState('');
+  const [editing, setEditing] = useState(false);
+  const [titleDraft, setTitleDraft] = useState('');
+  const [descDraft, setDescDraft] = useState('');
+
+  const isOwner = user?.id === bug?.createdBy?.id;
+
+  useEffect(() => {
+    if (bug) {
+      setTitleDraft(bug.title);
+      setDescDraft(bug.description || '');
+    }
+  }, [bug]);
+
+  const startEditing = () => {
+    setTitleDraft(bug?.title || '');
+    setDescDraft(bug?.description || '');
+    setEditing(true);
+  };
+
+  const cancelEditing = () => {
+    setTitleDraft(bug?.title || '');
+    setDescDraft(bug?.description || '');
+    setEditing(false);
+  };
+
+  const saveEditing = async () => {
+    const data: Record<string, string> = {};
+    if (titleDraft.trim() && titleDraft !== bug?.title) data.title = titleDraft.trim();
+    if (descDraft !== (bug?.description || '')) data.description = descDraft;
+    if (Object.keys(data).length > 0) {
+      await updateBug.mutateAsync({ id, ...data });
+      toast.success('수정되었습니다');
+    }
+    setEditing(false);
+  };
 
   if (isLoading) {
     return (
@@ -122,11 +156,16 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
     <div className="max-w-3xl mx-auto space-y-4">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <Link href="/bugs">
-          <Button variant="ghost" size="icon-sm"><ArrowLeft className="h-4 w-4" /></Button>
-        </Link>
+        <Button variant="ghost" size="icon-sm" onClick={() => router.back()}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <h1 className="text-lg font-bold text-gray-900 flex-1 truncate">{bug.title}</h1>
-        {user?.id === bug.createdBy.id && (
+        {isOwner && !editing && (
+          <Button variant="ghost" size="icon-sm" onClick={startEditing}>
+            <Pencil className="h-3.5 w-3.5 text-gray-400" />
+          </Button>
+        )}
+        {isOwner && (
           <Button variant="ghost" size="icon-sm" onClick={handleDelete}>
             <Trash2 className="h-4 w-4 text-error" />
           </Button>
@@ -175,8 +214,37 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
         </div>
       </Card>
 
-      {/* Description */}
-      {bug.description && (
+      {/* Editing Mode */}
+      {editing && (
+        <Card>
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">제목</label>
+              <input
+                className="w-full text-sm font-medium border border-gray-200 rounded-md px-3 py-2 outline-none focus:border-brand"
+                value={titleDraft}
+                onChange={(e) => setTitleDraft(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 block mb-1">설명</label>
+              <textarea
+                className="w-full text-sm border border-gray-200 rounded-md px-3 py-2 outline-none focus:border-brand min-h-[80px] resize-y"
+                value={descDraft}
+                onChange={(e) => setDescDraft(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={cancelEditing}>취소</Button>
+              <Button size="sm" onClick={saveEditing} isLoading={updateBug.isPending}>저장</Button>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* Description (view mode) */}
+      {!editing && bug.description && (
         <Card>
           <p className="text-sm text-gray-700 whitespace-pre-wrap">{bug.description}</p>
         </Card>

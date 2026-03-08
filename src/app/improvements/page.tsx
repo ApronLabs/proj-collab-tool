@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Plus, CircleDot, CheckCircle2, Circle, PauseCircle, RotateCcw, MessageSquare, Paperclip, Github } from 'lucide-react';
 import { useImprovements } from '@/lib/hooks/use-improvements';
 import { Button, Card, SkeletonList } from '@/components/ui';
@@ -46,8 +46,18 @@ function formatDate(dateStr: string) {
 }
 
 export default function ImprovementsPage() {
-  const [status, setStatus] = useState('');
-  const [priority, setPriority] = useState('');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const status = searchParams.get('status') || '';
+  const priority = searchParams.get('priority') || '';
+
+  function setFilter(key: string, value: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) params.set(key, value);
+    else params.delete(key);
+    const qs = params.toString();
+    router.replace(qs ? `/improvements?${qs}` : '/improvements');
+  }
 
   const { data: improvements, isLoading } = useImprovements({
     status: status || undefined,
@@ -73,7 +83,7 @@ export default function ImprovementsPage() {
           {STATUS_OPTIONS.map((o) => (
             <button
               key={o.value}
-              onClick={() => setStatus(status === o.value ? '' : o.value)}
+              onClick={() => setFilter('status', status === o.value ? '' : o.value)}
               className={`px-2.5 py-1 text-xs rounded-full font-medium transition-colors ${
                 status === o.value
                   ? 'bg-gray-900 text-white'
@@ -89,7 +99,7 @@ export default function ImprovementsPage() {
           {PRIORITY_OPTIONS.map((o) => (
             <button
               key={o.value}
-              onClick={() => setPriority(priority === o.value ? '' : o.value)}
+              onClick={() => setFilter('priority', priority === o.value ? '' : o.value)}
               className={`px-2.5 py-1 text-xs rounded-full font-medium transition-colors ${
                 priority === o.value
                   ? 'bg-gray-900 text-white'
@@ -102,7 +112,7 @@ export default function ImprovementsPage() {
         </div>
         {hasActiveFilter && (
           <button
-            onClick={() => { setStatus(''); setPriority(''); }}
+            onClick={() => router.replace('/improvements')}
             className="px-2 py-1 text-xs text-red-500 hover:text-red-700"
           >
             초기화

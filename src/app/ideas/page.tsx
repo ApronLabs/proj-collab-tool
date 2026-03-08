@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Plus, Lightbulb, CheckCircle2, Circle, PauseCircle, RotateCcw, ThumbsUp, MessageCircle } from 'lucide-react';
 import { useIdeas, useToggleVote } from '@/lib/hooks/use-ideas';
 import { Button, Card, SkeletonList } from '@/components/ui';
@@ -42,7 +42,18 @@ const statusLabel = (status: string) => {
 };
 
 export default function IdeasPage() {
-  const [status, setStatus] = useState('');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const status = searchParams.get('status') || '';
+
+  function setFilter(key: string, value: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) params.set(key, value);
+    else params.delete(key);
+    const qs = params.toString();
+    router.replace(qs ? `/ideas?${qs}` : '/ideas');
+  }
+
   const { data: ideas, isLoading } = useIdeas({ status: status || undefined });
   const toggleVote = useToggleVote();
 
@@ -71,7 +82,7 @@ export default function IdeasPage() {
         {STATUS_OPTIONS.map((o) => (
           <button
             key={o.value}
-            onClick={() => setStatus(o.value)}
+            onClick={() => setFilter('status', status === o.value ? '' : o.value)}
             className={`px-3 py-1 text-xs rounded-full font-medium transition-colors ${
               status === o.value
                 ? 'bg-brand text-white'
