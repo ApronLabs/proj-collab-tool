@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { ArrowLeft, ThumbsUp, Send, Trash2 } from 'lucide-react';
+import { ArrowLeft, ThumbsUp, Send, Trash2, Pencil, X, Check } from 'lucide-react';
 import { useIdea, useUpdateIdea, useDeleteIdea, useAddIdeaComment, useToggleVote, useUploadIdeaAttachment, useAddIdeaYoutubeLink, useDeleteIdeaAttachment } from '@/lib/hooks/use-ideas';
 import { Button, Card, Input } from '@/components/ui';
+import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/components/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MediaSection } from '@/components/media/media-section';
@@ -34,6 +35,9 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
   const deleteAttachment = useDeleteIdeaAttachment();
 
   const [comment, setComment] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
 
   if (isLoading) {
     return (
@@ -47,6 +51,19 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
   if (!idea) {
     return <div className="text-center py-12 text-gray-500">아이디어를 찾을 수 없습니다</div>;
   }
+
+  const handleEditStart = () => {
+    setEditTitle(idea.title);
+    setEditDescription(idea.description || '');
+    setIsEditing(true);
+  };
+
+  const handleEditSave = async () => {
+    if (!editTitle.trim()) return;
+    await updateIdea.mutateAsync({ id, title: editTitle, description: editDescription });
+    toast.success('수정되었습니다');
+    setIsEditing(false);
+  };
 
   const handleStatusChange = async (status: string) => {
     await updateIdea.mutateAsync({ id, status });
@@ -112,11 +129,36 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
         <Link href="/ideas">
           <Button variant="ghost" size="icon-sm"><ArrowLeft className="h-4 w-4" /></Button>
         </Link>
-        <h1 className="text-lg font-bold text-gray-900 flex-1 truncate">{idea.title}</h1>
+        {isEditing ? (
+          <Input
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            className="flex-1 text-lg font-bold"
+            autoFocus
+          />
+        ) : (
+          <h1 className="text-lg font-bold text-gray-900 flex-1 truncate">{idea.title}</h1>
+        )}
         {user?.id === idea.createdBy.id && (
-          <Button variant="ghost" size="icon-sm" onClick={handleDelete}>
-            <Trash2 className="h-4 w-4 text-error" />
-          </Button>
+          isEditing ? (
+            <>
+              <Button variant="ghost" size="icon-sm" onClick={handleEditSave} isLoading={updateIdea.isPending}>
+                <Check className="h-4 w-4 text-success" />
+              </Button>
+              <Button variant="ghost" size="icon-sm" onClick={() => setIsEditing(false)}>
+                <X className="h-4 w-4 text-gray-500" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" size="icon-sm" onClick={handleEditStart}>
+                <Pencil className="h-4 w-4 text-gray-500" />
+              </Button>
+              <Button variant="ghost" size="icon-sm" onClick={handleDelete}>
+                <Trash2 className="h-4 w-4 text-error" />
+              </Button>
+            </>
+          )
         )}
       </div>
 
@@ -170,11 +212,21 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
       </Card>
 
       {/* Description */}
-      {idea.description && (
+      {isEditing ? (
+        <Card>
+          <Textarea
+            label="설명"
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+            rows={6}
+            placeholder="설명을 입력하세요"
+          />
+        </Card>
+      ) : idea.description ? (
         <Card>
           <p className="text-sm text-gray-700 whitespace-pre-wrap">{idea.description}</p>
         </Card>
-      )}
+      ) : null}
 
       {/* Media Section */}
       <MediaSection

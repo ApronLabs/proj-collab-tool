@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { ArrowLeft, Send, Github, Trash2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Send, Github, Trash2, ExternalLink, Pencil, X, Check } from 'lucide-react';
 import { useImprovement, useUpdateImprovement, useDeleteImprovement, useAddImprovementComment, useUploadImprovementAttachment, useAddImprovementYoutubeLink, useDeleteImprovementAttachment, useUnlinkImprovementGithub } from '@/lib/hooks/use-improvements';
 import { Button, Card, Input } from '@/components/ui';
+import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/components/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MediaSection } from '@/components/media/media-section';
@@ -41,6 +42,9 @@ export default function ImprovementDetailPage({ params }: { params: Promise<{ id
   const unlinkGithub = useUnlinkImprovementGithub();
 
   const [comment, setComment] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
 
   if (isLoading) {
     return (
@@ -55,6 +59,19 @@ export default function ImprovementDetailPage({ params }: { params: Promise<{ id
   if (!improvement) {
     return <div className="text-center py-12 text-gray-500">항목을 찾을 수 없습니다</div>;
   }
+
+  const handleEditStart = () => {
+    setEditTitle(improvement.title);
+    setEditDescription(improvement.description || '');
+    setIsEditing(true);
+  };
+
+  const handleEditSave = async () => {
+    if (!editTitle.trim()) return;
+    await updateImprovement.mutateAsync({ id, title: editTitle, description: editDescription });
+    toast.success('수정되었습니다');
+    setIsEditing(false);
+  };
 
   const handleStatusChange = async (status: string) => {
     await updateImprovement.mutateAsync({ id, status });
@@ -120,11 +137,36 @@ export default function ImprovementDetailPage({ params }: { params: Promise<{ id
         <Link href="/improvements">
           <Button variant="ghost" size="icon-sm"><ArrowLeft className="h-4 w-4" /></Button>
         </Link>
-        <h1 className="text-lg font-bold text-gray-900 flex-1 truncate">{improvement.title}</h1>
+        {isEditing ? (
+          <Input
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            className="flex-1 text-lg font-bold"
+            autoFocus
+          />
+        ) : (
+          <h1 className="text-lg font-bold text-gray-900 flex-1 truncate">{improvement.title}</h1>
+        )}
         {user?.id === improvement.createdBy.id && (
-          <Button variant="ghost" size="icon-sm" onClick={handleDelete}>
-            <Trash2 className="h-4 w-4 text-error" />
-          </Button>
+          isEditing ? (
+            <>
+              <Button variant="ghost" size="icon-sm" onClick={handleEditSave} isLoading={updateImprovement.isPending}>
+                <Check className="h-4 w-4 text-success" />
+              </Button>
+              <Button variant="ghost" size="icon-sm" onClick={() => setIsEditing(false)}>
+                <X className="h-4 w-4 text-gray-500" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" size="icon-sm" onClick={handleEditStart}>
+                <Pencil className="h-4 w-4 text-gray-500" />
+              </Button>
+              <Button variant="ghost" size="icon-sm" onClick={handleDelete}>
+                <Trash2 className="h-4 w-4 text-error" />
+              </Button>
+            </>
+          )
         )}
       </div>
 
@@ -171,11 +213,21 @@ export default function ImprovementDetailPage({ params }: { params: Promise<{ id
       </Card>
 
       {/* Description */}
-      {improvement.description && (
+      {isEditing ? (
+        <Card>
+          <Textarea
+            label="설명"
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+            rows={6}
+            placeholder="설명을 입력하세요"
+          />
+        </Card>
+      ) : improvement.description ? (
         <Card>
           <p className="text-sm text-gray-700 whitespace-pre-wrap">{improvement.description}</p>
         </Card>
-      )}
+      ) : null}
 
       {/* GitHub Links */}
       {improvement.githubLinks?.length > 0 && (

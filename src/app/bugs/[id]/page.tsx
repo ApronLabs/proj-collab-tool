@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { Send, Github, Trash2, ExternalLink } from 'lucide-react';
+import { Send, Github, Trash2, ExternalLink, Pencil, X, Check } from 'lucide-react';
 import { useBug, useUpdateBug, useDeleteBug, useAddBugComment, useUploadBugAttachment, useAddBugYoutubeLink, useDeleteBugAttachment, useUnlinkBugGithub } from '@/lib/hooks/use-bugs';
 import { Button, Card, Input } from '@/components/ui';
+import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/components/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MediaSection } from '@/components/media/media-section';
@@ -41,6 +42,9 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
   const unlinkGithub = useUnlinkBugGithub();
 
   const [comment, setComment] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
 
   if (isLoading) {
     return (
@@ -64,6 +68,19 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
   const handlePriorityChange = async (priority: string) => {
     await updateBug.mutateAsync({ id, priority });
     toast.success('우선순위가 변경되었습니다');
+  };
+
+  const handleEditStart = () => {
+    setEditTitle(bug.title);
+    setEditDescription(bug.description || '');
+    setIsEditing(true);
+  };
+
+  const handleEditSave = async () => {
+    if (!editTitle.trim()) return;
+    await updateBug.mutateAsync({ id, title: editTitle, description: editDescription });
+    toast.success('수정되었습니다');
+    setIsEditing(false);
   };
 
   const handleDelete = async () => {
@@ -124,11 +141,36 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
         >
           ←
         </BackButton>
-        <h1 className="text-lg font-bold text-gray-900 flex-1 truncate">{bug.title}</h1>
+        {isEditing ? (
+          <Input
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            className="flex-1 text-lg font-bold"
+            autoFocus
+          />
+        ) : (
+          <h1 className="text-lg font-bold text-gray-900 flex-1 truncate">{bug.title}</h1>
+        )}
         {user?.id === bug.createdBy.id && (
-          <Button variant="ghost" size="icon-sm" onClick={handleDelete}>
-            <Trash2 className="h-4 w-4 text-error" />
-          </Button>
+          isEditing ? (
+            <>
+              <Button variant="ghost" size="icon-sm" onClick={handleEditSave} isLoading={updateBug.isPending}>
+                <Check className="h-4 w-4 text-success" />
+              </Button>
+              <Button variant="ghost" size="icon-sm" onClick={() => setIsEditing(false)}>
+                <X className="h-4 w-4 text-gray-500" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" size="icon-sm" onClick={handleEditStart}>
+                <Pencil className="h-4 w-4 text-gray-500" />
+              </Button>
+              <Button variant="ghost" size="icon-sm" onClick={handleDelete}>
+                <Trash2 className="h-4 w-4 text-error" />
+              </Button>
+            </>
+          )
         )}
       </div>
 
@@ -175,11 +217,21 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
       </Card>
 
       {/* Description */}
-      {bug.description && (
+      {isEditing ? (
+        <Card>
+          <Textarea
+            label="설명"
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+            rows={6}
+            placeholder="설명을 입력하세요"
+          />
+        </Card>
+      ) : bug.description ? (
         <Card>
           <p className="text-sm text-gray-700 whitespace-pre-wrap">{bug.description}</p>
         </Card>
-      )}
+      ) : null}
 
       {/* GitHub Links */}
       {bug.githubLinks?.length > 0 && (
