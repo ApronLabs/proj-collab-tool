@@ -72,10 +72,11 @@ export function useQACheck() {
   }, []);
 
   const getProgress = useCallback(
-    (section?: QASection) => {
+    (section?: QASection, sections?: QASection[]) => {
       if (!section) {
-        // Total progress
-        const allIds = QA_SECTIONS.flatMap((s) => getSectionItemIds(s));
+        // Total progress (optionally filtered)
+        const data = sections || QA_SECTIONS;
+        const allIds = data.flatMap((s) => getSectionItemIds(s));
         const checked = allIds.filter((id) => checks[id]).length;
         return { checked, total: allIds.length };
       }

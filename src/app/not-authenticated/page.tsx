@@ -88,7 +88,7 @@ export default function LoginPage() {
     <div className="flex flex-col items-center justify-center min-h-[60vh]">
       <div className="bg-white rounded-lg shadow-sm p-8 max-w-sm w-full">
         <h1 className="text-xl font-bold text-gray-900 mb-1 text-center">Collab</h1>
-        <p className="text-sm text-gray-500 mb-6 text-center">매출지킴이 계정으로 로그인하세요</p>
+        <p className="text-sm text-gray-500 mb-6 text-center">노심 계정으로 로그인하세요</p>
         <Suspense>
           <LoginForm />
         </Suspense>
