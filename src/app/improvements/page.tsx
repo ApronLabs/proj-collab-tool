@@ -31,12 +31,14 @@ const SERVICE_OPTIONS = [
   { value: 'nosim', label: '노심' },
   { value: 'collab', label: '협업도구' },
   { value: 'barcode', label: '바코드' },
+  { value: 'saleskeeper', label: '매출지킴이' },
 ];
 
 const SERVICE_MAP: Record<string, { text: string; color: string }> = {
   nosim: { text: '노심', color: 'text-blue-600 bg-blue-50' },
   collab: { text: '협업도구', color: 'text-green-600 bg-green-50' },
   barcode: { text: '바코드', color: 'text-orange-600 bg-orange-50' },
+  saleskeeper: { text: '매출지킴이', color: 'text-pink-600 bg-pink-50' },
 };
 
 const STATUS_MAP: Record<string, { icon: typeof CircleDot; text: string; color: string }> = {

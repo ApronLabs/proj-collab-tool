@@ -17,6 +17,7 @@ const SERVICES = [
   { value: 'nosim', label: '노심' },
   { value: 'collab', label: '협업도구' },
   { value: 'barcode', label: '바코드 스캐너' },
+  { value: 'saleskeeper', label: '매출지킴이' },
 ] as const;
 
 const REPOS = ['ApronLabs/proj-no-sim', 'ApronLabs/proj-collab-tool', 'ApronLabs/barcode-scanner'];
