@@ -13,7 +13,7 @@ export type QASection = {
   id: string;
   title: string;
   description?: string;
-  service?: string; // 'nosim' | 'collab' | 'barcode'
+  service?: string; // 'nosim' | 'collab' | 'barcode' | 'saleskeeper'
   subsections: QASubSection[];
 };
 

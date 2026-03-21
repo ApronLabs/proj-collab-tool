@@ -9,6 +9,7 @@ const SERVICE_OPTIONS = [
   { value: "nosim", label: "노심" },
   { value: "collab", label: "협업도구" },
   { value: "barcode", label: "바코드 스캐너" },
+  { value: "saleskeeper", label: "매출지킴이" },
 ] as const;
 
 function ProgressBar({ checked, total }: { checked: number; total: number }) {
@@ -34,7 +35,7 @@ function ProgressBar({ checked, total }: { checked: number; total: number }) {
 export default function CollabPage() {
   const router = useRouter();
   const { getProgress, resetAll, loaded } = useQACheck();
-  const [selectedService, setSelectedService] = useState("nosim");
+  const [selectedService, setSelectedService] = useState("saleskeeper");
 
   if (!loaded) {
     return (
@@ -50,7 +51,7 @@ export default function CollabPage() {
   }
 
   const filteredSections = QA_SECTIONS.filter(
-    (s) => (s.service || "nosim") === selectedService
+    (s) => (s.service || "saleskeeper") === selectedService
   );
   const totalProgress = getProgress(undefined, filteredSections);
 
