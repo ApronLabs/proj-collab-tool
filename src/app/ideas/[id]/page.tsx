@@ -130,9 +130,9 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
     <div className="max-w-3xl mx-auto space-y-4">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <Link href="/ideas">
-          <Button variant="ghost" size="icon-sm"><ArrowLeft className="h-4 w-4" /></Button>
-        </Link>
+        <Button variant="ghost" size="icon-sm" onClick={() => router.back()}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         {editingTitle ? (
           <div className="flex-1 flex items-center gap-1">
             <input

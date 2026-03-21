@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, Lightbulb, CheckCircle2, Circle, PauseCircle, RotateCcw, ThumbsUp, MessageCircle } from 'lucide-react';
 import { useIdeas, useToggleVote } from '@/lib/hooks/use-ideas';
@@ -41,8 +41,19 @@ const statusLabel = (status: string) => {
   return map[status] || { text: status, color: 'text-gray-500 bg-gray-100' };
 };
 
+const FILTER_KEY = 'ideas-filters';
+
 export default function IdeasPage() {
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    try { return JSON.parse(localStorage.getItem(FILTER_KEY) || '{}').status || ''; }
+    catch { return ''; }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(FILTER_KEY, JSON.stringify({ status }));
+  }, [status]);
+
   const { data: ideas, isLoading } = useIdeas({ status: status || undefined });
   const toggleVote = useToggleVote();
 

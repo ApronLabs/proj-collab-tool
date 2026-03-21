@@ -1355,6 +1355,1152 @@ export const QA_SECTIONS: QASection[] = [
       },
     ],
   },
+
+  // ═══════════════════════════════════════════════
+  // 노심v2 QA 테스트 가이드
+  // ═══════════════════════════════════════════════
+
+  // ─────────────────────────────────────────────
+  // 노심v2 — 로그인
+  // ─────────────────────────────────────────────
+  {
+    id: "nosim-login",
+    title: "로그인",
+    description: "/login",
+    service: "nosim",
+    subsections: [
+      {
+        id: "nosim-login-display",
+        title: "화면 표시",
+        items: [
+          { id: "nosim-login-1-1", text: "로그인 페이지가 정상적으로 열리는가?" },
+          { id: "nosim-login-1-2", text: "틸 그라디언트(#1E4A4A→#2A5C5C) 로고 박스(120x120px, rounded-2xl)와 SVG 아이콘이 보이는가?" },
+          { id: "nosim-login-1-3", text: '"노심" 타이틀(text-4xl, bold)이 보이는가?' },
+          { id: "nosim-login-1-4", text: '"로그인" 타이틀(text-xl, 가운데 정렬)이 보이는가?' },
+          { id: "nosim-login-1-5", text: '"이메일" 입력란(h-14, rounded-xl, placeholder "이메일")이 보이는가?' },
+          { id: "nosim-login-1-6", text: '"비밀번호" 입력란(h-14, rounded-xl, placeholder "비밀번호")이 보이는가?' },
+          { id: "nosim-login-1-7", text: "비밀번호 입력란 우측에 Eye/EyeOff 토글 아이콘(22x22px)이 보이는가?" },
+          { id: "nosim-login-1-8", text: "Eye 아이콘 클릭 → 비밀번호 표시/숨김이 전환되는가?" },
+          { id: "nosim-login-1-9", text: '"자동로그인" 체크박스(틸 색상 #2A5C5C)가 보이는가?' },
+          { id: "nosim-login-1-10", text: '"로그인" 버튼(골드 그라디언트 #C4A46A→#D8BC84, h-14, white text)이 보이는가?' },
+          { id: "nosim-login-1-11", text: '"또는" 구분선(양쪽 수평선 + 텍스트)이 보이는가?' },
+          { id: "nosim-login-1-12", text: '"회원가입" 버튼(외곽선, UserPlus 아이콘)이 보이는가?' },
+          { id: "nosim-login-1-13", text: '하단에 "비밀번호 찾기" 링크가 보이는가?' },
+        ],
+      },
+      {
+        id: "nosim-login-validation",
+        title: "입력 검증",
+        items: [
+          { id: "nosim-login-2-1", text: "이메일/비밀번호를 비워두고 로그인 클릭 → 오류 메시지가 나오는가?" },
+          { id: "nosim-login-2-2", text: "잘못된 이메일로 로그인 → 빨간 알림 박스(bg-red-50, border-red-200)에 오류가 표시되는가?" },
+          { id: "nosim-login-2-3", text: "올바른 이메일 + 잘못된 비밀번호 → 오류 메시지가 나오는가?" },
+          { id: "nosim-login-2-4", text: "로그인 버튼 클릭 시 스피너가 표시되고 \"로딩중...\"으로 변경되는가?" },
+          { id: "nosim-login-2-5", text: "로딩 중 버튼이 비활성화(opacity-50)되는가?" },
+        ],
+      },
+      {
+        id: "nosim-login-success",
+        title: "정상 로그인",
+        items: [
+          { id: "nosim-login-3-1", text: "올바른 이메일/비밀번호로 로그인 → 대시보드(/dashboard)로 이동하는가?" },
+          { id: "nosim-login-3-2", text: "로그인 상태에서 /login 접속 → 대시보드로 자동 이동되는가?" },
+          { id: "nosim-login-3-3", text: "미로그인 상태에서 보호된 페이지 접속 → 로그인으로 리다이렉트되는가?" },
+          { id: "nosim-login-3-4", text: "자동로그인 체크 후 로그인 → 브라우저 재시작 후에도 로그인 유지되는가?" },
+        ],
+      },
+      {
+        id: "nosim-login-v1-compare",
+        title: "v1 대비 누락 기능 확인",
+        items: [
+          { id: "nosim-login-m1", text: "'이메일 찾기' 링크가 있는가? (v1에 있었음 — v2 누락)" },
+          { id: "nosim-login-m2", text: "회원가입 버튼 클릭 → 회원가입 페이지로 이동하는가? (v1에 있었음 — v2 확인 필요)" },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // 노심v2 — 대시보드
+  // ─────────────────────────────────────────────
+  {
+    id: "nosim-dashboard",
+    title: "대시보드",
+    description: "/dashboard",
+    service: "nosim",
+    subsections: [
+      {
+        id: "nosim-dash-header",
+        title: "헤더 / 날짜",
+        items: [
+          { id: "nosim-dash-1-1", text: "대시보드 페이지가 정상적으로 열리는가?" },
+          { id: "nosim-dash-1-2", text: "상단에 매장명이 표시되는가?" },
+          { id: "nosim-dash-1-3", text: "날짜 선택기(YYYY-MM-DD)가 보이고 날짜 변경이 가능한가?" },
+          { id: "nosim-dash-1-4", text: "요일 라벨이 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-dash-kpi",
+        title: "어제 확정수익 KPI (v2 신규)",
+        items: [
+          { id: "nosim-dash-2-1", text: '"어제 확정수익" 카드가 표시되는가?' },
+          { id: "nosim-dash-2-2", text: "수익 금액이 emerald-500 색상으로 크게 표시되는가?" },
+          { id: "nosim-dash-2-3", text: "수직 구분선 옆에 매출건수, 매출금액, 비용금액이 작은 텍스트로 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-dash-trend",
+        title: "순익 추이 (v2 신규)",
+        items: [
+          { id: "nosim-dash-3-1", text: '"순익 추이" 섹션 타이틀과 링크 아이콘이 보이는가?' },
+          { id: "nosim-dash-3-2", text: "기간 탭 선택기(일간/주간/월간)가 보이는가?" },
+          { id: "nosim-dash-3-3", text: "각 탭 클릭 시 차트 데이터가 변경되는가?" },
+          { id: "nosim-dash-3-4", text: "바 차트가 정상 렌더링되는가?" },
+          { id: "nosim-dash-3-5", text: "수익/손실이 색상으로 구분되는가?" },
+          { id: "nosim-dash-3-6", text: "축 라벨과 값이 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-dash-activity",
+        title: "활동 섹션 (v2 신규)",
+        items: [
+          { id: "nosim-dash-4-1", text: '"활동" 섹션이 표시되는가?' },
+          { id: "nosim-dash-4-2", text: '활동 유형 태그가 색상으로 구분되는가? (출고: 빨강, 입고: 파랑, 조정: 주황, 취소: 회색, 체크: 초록, 발주: 보라, 수령: 틸)' },
+          { id: "nosim-dash-4-3", text: "각 활동 항목에 품목명, 수량, 시간이 표시되는가?" },
+          { id: "nosim-dash-4-4", text: "취소 활동 클릭 시 상세 모달이 열리는가?" },
+          { id: "nosim-dash-4-5", text: "취소 모달에 취소선 품목명, 원본 기록(시간/작업자/변동량), 취소 처리 정보가 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-dash-v1-compare",
+        title: "v1 대비 누락 기능 확인",
+        items: [
+          { id: "nosim-dash-m1", text: "빠른 검색(품목명/바코드/브랜드) 검색바가 있는가? (v1에 있었음 — v2 누락)" },
+          { id: "nosim-dash-m2", text: "바코드 스캐너(전체 화면 오버레이)가 있는가? (v1에 있었음 — v2는 재고에서 제공)" },
+          { id: "nosim-dash-m3", text: "오늘 할 일(TodayTasks) 섹션이 있는가? (v1에 있었음 — v2 누락)" },
+          { id: "nosim-dash-m4", text: "최근 활동(RecentActivity) 섹션이 있는가? (v1에 있었음 — v2는 활동 탭으로 변경)" },
+          { id: "nosim-dash-m5", text: "한글 초성 검색이 있는가? (v1에 있었음 — v2 누락)" },
+          { id: "nosim-dash-m6", text: "스캐너 카드(퀵 액세스)가 있는가? (v1에 있었음 — v2 누락)" },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // 노심v2 — 재고 목록
+  // ─────────────────────────────────────────────
+  {
+    id: "nosim-inventory",
+    title: "재고 관리",
+    description: "/inventory",
+    service: "nosim",
+    subsections: [
+      {
+        id: "nosim-inv-header",
+        title: "헤더 / 탭",
+        items: [
+          { id: "nosim-inv-1-1", text: "재고 페이지가 정상적으로 열리는가?" },
+          { id: "nosim-inv-1-2", text: '"재고" 타이틀이 표시되는가?' },
+          { id: "nosim-inv-1-3", text: "매장 선택 드롭다운이 보이는가?" },
+          { id: "nosim-inv-1-4", text: '탭 네비게이션("재고" | "활동")이 보이는가?' },
+          { id: "nosim-inv-1-5", text: "탭 전환이 정상 동작하는가?" },
+        ],
+      },
+      {
+        id: "nosim-inv-search",
+        title: "검색 / 필터",
+        items: [
+          { id: "nosim-inv-2-1", text: "상단에 검색바(돋보기 아이콘)가 보이는가?" },
+          { id: "nosim-inv-2-2", text: "품목명으로 검색 → 해당 품목만 표시되는가?" },
+          { id: "nosim-inv-2-3", text: "검색어 삭제 → 전체 목록으로 복귀하는가?" },
+          { id: "nosim-inv-2-4", text: '상태 필터 버튼("전체" | "긴급발주" | "부족" | "안전")이 보이는가?' },
+          { id: "nosim-inv-2-5", text: "각 필터 버튼 클릭 → 해당 상태 품목만 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-inv-item-card",
+        title: "품목 카드",
+        items: [
+          { id: "nosim-inv-3-1", text: "각 품목에 품목명(bold, slate-900)이 표시되는가?" },
+          { id: "nosim-inv-3-2", text: "카테고리 배지(small, slate-500)가 표시되는가?" },
+          { id: "nosim-inv-3-3", text: "현재 재고 수량이 크게 표시되고 상태별 색상이 적용되는가?" },
+          { id: "nosim-inv-3-4", text: "안전재고 대비 비교가 표시되는가?" },
+          { id: "nosim-inv-3-5", text: '상태 배지가 정상인가? ("즉시발주": 빨강, "부족": 노랑, "안전": 남색)' },
+          { id: "nosim-inv-3-6", text: '"발주하기" 버튼(남색, rounded)이 보이고 동작하는가?' },
+          { id: "nosim-inv-3-7", text: "마지막 업데이트 시간(작은 회색 텍스트)이 표시되는가?" },
+          { id: "nosim-inv-3-8", text: "품목 카드 클릭 → 품목 상세 페이지로 이동하는가?" },
+        ],
+      },
+      {
+        id: "nosim-inv-activity-tab",
+        title: "활동 탭 (v2 신규)",
+        items: [
+          { id: "nosim-inv-4-1", text: "활동 탭 선택 → 타임라인 형태의 재고 변동 이력이 표시되는가?" },
+          { id: "nosim-inv-4-2", text: "각 로그에 활동 유형 배지가 표시되는가?" },
+          { id: "nosim-inv-4-3", text: "품목명, 수량 변동(+/-), 전후 수량이 표시되는가?" },
+          { id: "nosim-inv-4-4", text: "타임스탬프(작은 회색)와 작업자 이름이 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-inv-v1-compare",
+        title: "v1 대비 누락 기능 확인",
+        items: [
+          { id: "nosim-inv-m1", text: '뷰 모드 탭(전체, 카테고리, 바코드 없음, 발주 대기, 미분류 발주, 비활성화)이 있는가? (v1에 있었음 — v2 간소화)' },
+          { id: "nosim-inv-m2", text: "+/- 빠른 재고 조정 버튼이 있는가? (v1에 있었음 — v2 확인 필요)" },
+          { id: "nosim-inv-m3", text: "드래그 & 드롭 정렬(dnd-kit)이 있는가? (v1에 있었음 — v2 누락)" },
+          { id: "nosim-inv-m4", text: "차트 보기(Bar/Pie)가 있는가? (v1에 있었음 — v2 누락)" },
+          { id: "nosim-inv-m5", text: "바코드 복사 기능이 있는가? (v1에 있었음 — v2 누락)" },
+          { id: "nosim-inv-m6", text: "카카오 공유(손실량 보고서)가 있는가? (v1에 있었음 — v2 누락)" },
+          { id: "nosim-inv-m7", text: '하단 단축 버튼(바코드 스캔, 바코드 인쇄, 재고 순서 편집, 재고 변경 이력, 달력 보기)이 있는가? (v1에 있었음 — v2 확인 필요)' },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // 노심v2 — 품목 추가
+  // ─────────────────────────────────────────────
+  {
+    id: "nosim-item-add",
+    title: "품목 추가 (신규 상품 등록)",
+    description: "/inventory/add",
+    service: "nosim",
+    subsections: [
+      {
+        id: "nosim-add-header",
+        title: "헤더",
+        items: [
+          { id: "nosim-add-1-1", text: '뒤로가기 버튼(ArrowLeft) + "신규 상품 등록" 타이틀이 보이는가?' },
+          { id: "nosim-add-1-2", text: "배경이 #f8f9fc인가?" },
+          { id: "nosim-add-1-3", text: "에러 발생 시 빨간 알림(AlertCircle 아이콘, bg-red-50, border-red-200)이 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-add-product-info",
+        title: "상품정보 섹션",
+        items: [
+          { id: "nosim-add-2-1", text: '"상품정보" 섹션 헤더(좌측 엑센트 보더)가 보이는가?' },
+          { id: "nosim-add-2-2", text: '"상품명 *" 필수 입력란(placeholder: "상품명을 입력하세요", rounded-xl)이 보이는가?' },
+          { id: "nosim-add-2-3", text: '"브랜드" 입력란(placeholder: "브랜드명 입력")이 보이는가?' },
+          { id: "nosim-add-2-4", text: "단위 선택 pill 버튼(개, kg, L, 박스, 팩, 봉)이 보이는가?" },
+          { id: "nosim-add-2-5", text: "선택된 단위: 남색 배경(indigo-600) + 흰 글자, 미선택: stone-50 + slate-600인가?" },
+          { id: "nosim-add-2-6", text: '"단위 수량 (1{단위} = ?개)" 입력란(placeholder: "1")이 보이는가?' },
+          { id: "nosim-add-2-7", text: '"안전재고" 입력란(placeholder: "0")이 보이는가?' },
+        ],
+      },
+      {
+        id: "nosim-add-category-supplier",
+        title: "카테고리 / 발주처",
+        items: [
+          { id: "nosim-add-3-1", text: "카테고리 선택 드롭다운(첫 옵션: \"카테고리 선택\")이 보이는가?" },
+          { id: "nosim-add-3-2", text: "API에서 로드된 카테고리 목록이 표시되는가?" },
+          { id: "nosim-add-3-3", text: '"발주처명" 입력란(placeholder: "발주처 이름 입력")이 보이는가?' },
+          { id: "nosim-add-3-4", text: '발주 방식 드롭다운("선택 안함", "온라인 발주", "카카오톡", "전화주문", "문자주문")이 보이는가?' },
+        ],
+      },
+      {
+        id: "nosim-add-extra",
+        title: "구매 URL / 바코드 / 메모",
+        items: [
+          { id: "nosim-add-4-1", text: "구매 URL 텍스트 영역(줄바꿈 구분, rows: 3)이 보이는가?" },
+          { id: "nosim-add-4-2", text: '바코드 입력란(monospace, placeholder: "바코드 번호")이 보이는가?' },
+          { id: "nosim-add-4-3", text: '메모 텍스트 영역(rows: 3, placeholder: "메모 입력")이 보이는가?' },
+        ],
+      },
+      {
+        id: "nosim-add-image",
+        title: "이미지 업로드",
+        items: [
+          { id: "nosim-add-5-1", text: '사진 업로드 버튼(Camera 아이콘 + "사진 업로드", indigo-600)이 보이는가?' },
+          { id: "nosim-add-5-2", text: "파일 선택 → 이미지 미리보기가 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-add-submit",
+        title: "등록 / 검증",
+        items: [
+          { id: "nosim-add-6-1", text: '"등록" 버튼(전체 너비, indigo-600)이 보이는가?' },
+          { id: "nosim-add-6-2", text: "상품명 비어있으면 → 버튼이 비활성화되는가?" },
+          { id: "nosim-add-6-3", text: "등록 클릭 → 스피너 표시 + \"등록 중...\" 텍스트로 변경되는가?" },
+          { id: "nosim-add-6-4", text: "등록 성공 → 재고 목록에 새 품목이 나타나는가?" },
+        ],
+      },
+      {
+        id: "nosim-add-v1-compare",
+        title: "v1 대비 누락 기능 확인",
+        items: [
+          { id: "nosim-add-m1", text: '카테고리 가로 스크롤 pill + "추가" pill(인라인 생성)이 있는가? (v1에 있었음 — v2 드롭다운으로 변경)' },
+          { id: "nosim-add-m2", text: '발주처 드롭다운(온라인/저장된 발주처 그룹 + 직접입력)이 있는가? (v1에 있었음 — v2 텍스트 입력으로 변경)' },
+          { id: "nosim-add-m3", text: "바코드 스캔 카메라 버튼(📷)이 있는가? (v1에 있었음 — v2 확인 필요)" },
+          { id: "nosim-add-m4", text: '바코드 중복 검사(스피너 + 초록 체크 / 빨강 "이미 등록됨")가 동작하는가? (v1에 있었음)' },
+          { id: "nosim-add-m5", text: '"+ 바코드 추가" 다중 바코드 등록이 가능한가? (v1에 있었음 — v2 누락)' },
+          { id: "nosim-add-m6", text: '"바코드 없는 상품" 자동 생성이 있는가? (v1에 있었음 — v2 확인 필요)' },
+          { id: "nosim-add-m7", text: '"취소" 버튼(외곽선)이 있는가? (v1에 있었음 — v2 확인 필요)' },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // 노심v2 — 품목 상세
+  // ─────────────────────────────────────────────
+  {
+    id: "nosim-item-detail",
+    title: "품목 상세",
+    description: "/inventory/[id]",
+    service: "nosim",
+    subsections: [
+      {
+        id: "nosim-detail-header",
+        title: "헤더",
+        items: [
+          { id: "nosim-detail-1-1", text: "뒤로가기 버튼 + 품목명(수정 연필 아이콘)이 보이는가?" },
+          { id: "nosim-detail-1-2", text: "브랜드명이 표시되는가? (등록된 경우)" },
+          { id: "nosim-detail-1-3", text: "재고 상태 배지(안전/부족)가 표시되는가?" },
+          { id: "nosim-detail-1-4", text: '수정 버튼(연필 아이콘 + "수정") 또는 닫기 버튼(X)이 보이는가?' },
+        ],
+      },
+      {
+        id: "nosim-detail-stock",
+        title: "① 재고현황",
+        items: [
+          { id: "nosim-detail-2-1", text: '"재고현황" 타이틀과 상태 점(색상 구분)이 보이는가?' },
+          { id: "nosim-detail-2-2", text: "3열 그리드: 현재 재고(크게, 색상), 안전재고, 비율(%)이 표시되는가?" },
+          { id: "nosim-detail-2-3", text: "마지막 업데이트 시간(작은 회색, 우측 정렬)이 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-detail-edit",
+        title: "② 수정 모드",
+        items: [
+          { id: "nosim-detail-3-1", text: '수정 버튼 클릭 → 파란 엑센트 보더 + "상품 정보 수정" 섹션이 표시되는가?' },
+          { id: "nosim-detail-3-2", text: "기존 값이 각 입력란에 미리 채워져 있는가?" },
+          { id: "nosim-detail-3-3", text: "저장 버튼 클릭 → 스피너 표시 후 수정이 완료되는가?" },
+          { id: "nosim-detail-3-4", text: "취소 버튼 클릭 → 수정 모드가 닫히는가?" },
+        ],
+      },
+      {
+        id: "nosim-detail-info",
+        title: "③ 상품 정보",
+        items: [
+          { id: "nosim-detail-4-1", text: '"상품 정보" 타이틀(Package 아이콘)이 보이는가?' },
+          { id: "nosim-detail-4-2", text: "2열 행: 라벨(회색, xs) | 값(slate-700, bold)으로 표시되는가?" },
+          { id: "nosim-detail-4-3", text: "바코드(복사 버튼 포함, monospace)가 표시되는가?" },
+          { id: "nosim-detail-4-4", text: "단위, 카테고리가 표시되는가?" },
+          { id: "nosim-detail-4-5", text: "메모가 border-top 구분선 아래에 별도 블록으로 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-detail-price",
+        title: "④ 가격 정보",
+        items: [
+          { id: "nosim-detail-5-1", text: '"가격 정보" 타이틀(Tag 아이콘)이 보이는가?' },
+          { id: "nosim-detail-5-2", text: "구매단가, 판매단가, 최근발주단가, 최근발주일 행이 표시되는가?" },
+          { id: "nosim-detail-5-3", text: '가격 이력 펼치기/접기가 가능한가? ("가격 이력" 서브 헤딩)' },
+          { id: "nosim-detail-5-4", text: "타임라인 형태로 발주처, 단가, 수량, 총액, 날짜가 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-detail-supplier",
+        title: "⑤ 발주처 정보",
+        items: [
+          { id: "nosim-detail-6-1", text: '"발주처 정보" 타이틀(ShoppingCart 아이콘)이 보이는가?' },
+          { id: "nosim-detail-6-2", text: "기본 발주처명과 타입 배지가 표시되는가?" },
+          { id: "nosim-detail-6-3", text: "연락처: 전화(Phone 아이콘, 클릭 가능)와 이메일(Mail 아이콘, 클릭 가능)이 표시되는가?" },
+          { id: "nosim-detail-6-4", text: "구매 링크(ExternalLink 아이콘): 사이트별 색상(쿠팡: 빨강, 배민: 틸, 네이버: 초록)으로 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-detail-orders",
+        title: "⑥ 최근 발주",
+        items: [
+          { id: "nosim-detail-7-1", text: '"최근 발주" 타이틀(TrendingUp 아이콘)이 보이는가?' },
+          { id: "nosim-detail-7-2", text: "각 발주 카드에 발주처명, 상태 배지, 발주일이 표시되는가?" },
+          { id: "nosim-detail-7-3", text: "단가 × 수량 = 소계가 표시되는가?" },
+          { id: "nosim-detail-7-4", text: '상태: "전량 입고 완료"(초록, CheckCircle2) 또는 "입고 n/m단위"(노랑, AlertTriangle)가 표시되는가?' },
+        ],
+      },
+      {
+        id: "nosim-detail-batch",
+        title: "⑦ 재고 배치 (유통기한)",
+        items: [
+          { id: "nosim-detail-8-1", text: "배치 카드에 잔여 수량이 표시되는가?" },
+          { id: "nosim-detail-8-2", text: "유통기한 + 만료까지 남은 일수가 표시되는가?" },
+          { id: "nosim-detail-8-3", text: "유통기한 상태별 색상이 적용되는가? (만료: 빨강, 임박: 노랑)" },
+          { id: "nosim-detail-8-4", text: "입고일과 발주처 타입이 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-detail-logs",
+        title: "⑧ 재고 변동 이력",
+        items: [
+          { id: "nosim-detail-9-1", text: '"재고 변동 이력" 타이틀(Clock 아이콘)이 보이는가?' },
+          { id: "nosim-detail-9-2", text: "시간순 변경 이력에 유형(입고/출고), 수량, 시간, 사용자가 표시되는가?" },
+          { id: "nosim-detail-9-3", text: "수량 변동: 증가(+초록), 감소(-빨강), monospace로 표시되는가?" },
+          { id: "nosim-detail-9-4", text: "전후 수량이 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-detail-status",
+        title: "⑨ 상태 관리 / 메타",
+        items: [
+          { id: "nosim-detail-10-1", text: '"비활성화"/"활성화" 토글 버튼이 보이는가?' },
+          { id: "nosim-detail-10-2", text: "비활성화 시 재고 목록에서 숨겨지는가?" },
+          { id: "nosim-detail-10-3", text: '"메타 정보"(FileText 아이콘): 생성일, 수정일, 상품 ID(monospace, 회색)가 표시되는가?' },
+        ],
+      },
+      {
+        id: "nosim-detail-v1-compare",
+        title: "v1 대비 누락 기능 확인",
+        items: [
+          { id: "nosim-detail-m1", text: "발주처별 가격 비교(최신/평균/최저/최고)가 있는가? (v1에 있었음 — v2 확인 필요)" },
+          { id: "nosim-detail-m2", text: "+/- 빠른 재고 조정 버튼이 있는가? (v1에 있었음 — v2 확인 필요)" },
+          { id: "nosim-detail-m3", text: "시각적 재고 바(progress bar)가 있는가? (v1에 있었음 — v2 확인 필요)" },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // 노심v2 — 발주 (주문)
+  // ─────────────────────────────────────────────
+  {
+    id: "nosim-order",
+    title: "발주 (주문)",
+    description: "/inventory/[id]/order",
+    service: "nosim",
+    subsections: [
+      {
+        id: "nosim-order-header",
+        title: "헤더 / 품목 정보",
+        items: [
+          { id: "nosim-order-1-1", text: '뒤로가기 버튼 + "발주하기" 타이틀이 보이는가?' },
+          { id: "nosim-order-1-2", text: '"발주 등록" 라벨이 보이는가?' },
+          { id: "nosim-order-1-3", text: "품목명(bold), 브랜드(indigo-500, 있을 경우)가 표시되는가?" },
+          { id: "nosim-order-1-4", text: "현재 재고(색상 구분), 안전재고, 최근 발주 단가가 작은 텍스트로 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-order-quantity",
+        title: "발주 수량",
+        items: [
+          { id: "nosim-order-2-1", text: '"발주 수량" 라벨(필수 표시)이 보이는가?' },
+          { id: "nosim-order-2-2", text: "수량 입력: −/+ 원형 버튼(11x11)과 가운데 숫자 입력(2xl, 큰 텍스트)이 보이는가?" },
+          { id: "nosim-order-2-3", text: "단위 라벨이 숫자 옆에 표시되는가?" },
+          { id: "nosim-order-2-4", text: "부족량 계산 도우미 텍스트가 표시되는가?" },
+          { id: "nosim-order-2-5", text: "+/- 버튼으로 수량이 정상 증감하는가?" },
+        ],
+      },
+      {
+        id: "nosim-order-supplier",
+        title: "발주처 / 발주 방식",
+        items: [
+          { id: "nosim-order-3-1", text: '"발주처" 라벨(필수) + 텍스트 입력란(placeholder: "예: 배민상회, 네이버, 코스트코")이 보이는가?' },
+          { id: "nosim-order-3-2", text: '발주 방식 버튼 그룹("온라인 주문" | "카카오톡" | "전화주문" | "문자주문")이 보이는가?' },
+          { id: "nosim-order-3-3", text: "선택된 방식: indigo-600 배경 + 흰 글자, 미선택: 흰 배경 + stone-200 테두리인가?" },
+          { id: "nosim-order-3-4", text: '"카카오/전화/문자 선택 시 발주 메시지를 복사할 수 있습니다" 안내가 보이는가?' },
+        ],
+      },
+      {
+        id: "nosim-order-extra",
+        title: "예상 입고일 / 단가 / 메모",
+        items: [
+          { id: "nosim-order-4-1", text: '"예상 입고일" 날짜 선택기(Calendar 아이콘, 최소: 오늘)가 보이는가?' },
+          { id: "nosim-order-4-2", text: '"단가" 입력란(선택, "/" + 단위 표시)이 보이는가?' },
+          { id: "nosim-order-4-3", text: "단가 입력 시 예상 금액(indigo-500)이 계산되어 표시되는가?" },
+          { id: "nosim-order-4-4", text: '"메모" 텍스트 영역(FileText 아이콘, rows: 3, placeholder: "발주 관련 메모")이 보이는가?' },
+        ],
+      },
+      {
+        id: "nosim-order-online",
+        title: "온라인 구매 링크",
+        items: [
+          { id: "nosim-order-5-1", text: "구매 URL이 등록된 경우 \"온라인 구매\" 섹션(ExternalLink 아이콘)이 보이는가?" },
+          { id: "nosim-order-5-2", text: '사이트별 색상 버튼(쿠팡: red-50, 배민: teal-50, 네이버: green-50, 기본: indigo-50)이 표시되는가?' },
+          { id: "nosim-order-5-3", text: '각 버튼에 사이트명(bold), 최근 가격(small), "바로구매" + ExternalLink가 표시되는가?' },
+          { id: "nosim-order-5-4", text: "바로구매 클릭 → 새 탭에서 해당 URL이 열리는가?" },
+        ],
+      },
+      {
+        id: "nosim-order-message",
+        title: "발주 메시지 복사 (카카오/전화/문자)",
+        items: [
+          { id: "nosim-order-6-1", text: "카카오톡/전화/문자 선택 시 파란 박스(blue-50)에 발주 메시지가 표시되는가?" },
+          { id: "nosim-order-6-2", text: '"카카오톡으로 발주하시나요?" 등 방식별 안내 문구가 표시되는가?' },
+          { id: "nosim-order-6-3", text: '복사 버튼(Copy 아이콘 + "복사") 클릭 → "복사됨"(Check 아이콘, green-100)으로 변경되는가?' },
+          { id: "nosim-order-6-4", text: "발주 메시지가 monospace 포맷으로 정확히 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-order-submit",
+        title: "하단 버튼",
+        items: [
+          { id: "nosim-order-7-1", text: '고정 하단 바에 "취소"(stone-100, slate-700)와 발주 완료 버튼(indigo-600)이 보이는가?' },
+          { id: "nosim-order-7-2", text: '발주 완료 버튼에 "{수량}{단위} 발주 완료" 텍스트가 표시되는가?' },
+          { id: "nosim-order-7-3", text: "발주처 비어있거나 수량 0이면 → 버튼이 비활성화되는가?" },
+          { id: "nosim-order-7-4", text: '제출 중 → "등록 중..." 텍스트와 스피너가 표시되는가?' },
+          { id: "nosim-order-7-5", text: '발주 성공 → "✓ 발주가 등록되었습니다." 토스트가 표시되고 /inventory로 이동하는가?' },
+        ],
+      },
+      {
+        id: "nosim-order-v1-compare",
+        title: "v1 대비 누락 기능 확인",
+        items: [
+          { id: "nosim-order-m1", text: "발주처 드롭다운(기본 발주처 미리 선택)이 있는가? (v1에 있었음 — v2 텍스트 입력)" },
+          { id: "nosim-order-m2", text: "단위 환산 정보가 표시되는가? (v1에 있었음 — v2 확인 필요)" },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // 노심v2 — 손익분석
+  // ─────────────────────────────────────────────
+  {
+    id: "nosim-profit-loss",
+    title: "손익분석",
+    description: "/profit-loss (4탭: 발주/비용/채널/손익계산서)",
+    service: "nosim",
+    subsections: [
+      {
+        id: "nosim-pnl-header",
+        title: "헤더 / 공통",
+        items: [
+          { id: "nosim-pnl-1-1", text: "손익분석 페이지가 정상적으로 열리는가?" },
+          { id: "nosim-pnl-1-2", text: '"손익계산" 타이틀이 표시되는가?' },
+          { id: "nosim-pnl-1-3", text: "연월 선택기가 보이고 월 변경이 가능한가?" },
+          { id: "nosim-pnl-1-4", text: "매장명이 표시되는가?" },
+          { id: "nosim-pnl-1-5", text: '탭 네비게이션("발주" | "비용" | "채널" | "손익계산서")이 보이는가?' },
+          { id: "nosim-pnl-1-6", text: "선택된 탭: 파란 하단 보더, 미선택: 회색인가?" },
+          { id: "nosim-pnl-1-7", text: "탭 전환 시 해당 패널이 로딩되는가?" },
+        ],
+      },
+      {
+        id: "nosim-pnl-order",
+        title: "발주 탭",
+        items: [
+          { id: "nosim-pnl-2-1", text: "발주 분석 데이터가 표시되는가?" },
+          { id: "nosim-pnl-2-2", text: "데이터 로딩 중 스피너가 표시되는가?" },
+          { id: "nosim-pnl-2-3", text: "발주처별/품목별 발주 내역이 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-pnl-cost",
+        title: "비용 탭 (v2 신규: 고정비/변동비)",
+        items: [
+          { id: "nosim-pnl-3-1", text: "비용 입력 패널이 표시되는가?" },
+          { id: "nosim-pnl-3-2", text: "고정비 섹션: 항목별 입력 필드가 있는가?" },
+          { id: "nosim-pnl-3-3", text: "변동비 섹션: 항목별 입력 필드가 있는가?" },
+          { id: "nosim-pnl-3-4", text: "비용 항목 추가/삭제가 가능한가?" },
+          { id: "nosim-pnl-3-5", text: "입력한 비용이 저장되는가?" },
+        ],
+      },
+      {
+        id: "nosim-pnl-channel",
+        title: "채널 탭",
+        items: [
+          { id: "nosim-pnl-4-1", text: "채널별 매출 분석이 표시되는가?" },
+          { id: "nosim-pnl-4-2", text: "채널별 비용 분석이 표시되는가?" },
+          { id: "nosim-pnl-4-3", text: "채널별 수익 계산이 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-pnl-statement",
+        title: "손익계산서 탭",
+        items: [
+          { id: "nosim-pnl-5-1", text: "손익계산서가 표 형태로 표시되는가?" },
+          { id: "nosim-pnl-5-2", text: "매출, 비용, 이익 항목이 구분되어 표시되는가?" },
+          { id: "nosim-pnl-5-3", text: "수정 가능한 필드가 있는가?" },
+          { id: "nosim-pnl-5-4", text: "합계가 자동 계산되는가?" },
+        ],
+      },
+      {
+        id: "nosim-pnl-expense",
+        title: "비용 개요 (v2 신규)",
+        items: [
+          { id: "nosim-pnl-6-1", text: "비용 카드에 카테고리명, 금액(색상), 비율(%)이 표시되는가?" },
+          { id: "nosim-pnl-6-2", text: "비용 파이 차트가 정상 렌더링되는가?" },
+          { id: "nosim-pnl-6-3", text: "인사이트/추천사항이 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-pnl-v1-compare",
+        title: "v1 대비 변경/누락 확인",
+        items: [
+          { id: "nosim-pnl-m1", text: "원재료 달력(월별 입출고 추이)이 있는가? (v1에 있었음 — v2 확인 필요)" },
+          { id: "nosim-pnl-m2", text: "품목 가격 추이 차트가 있는가? (v1에 있었음 — v2 확인 필요)" },
+          { id: "nosim-pnl-m3", text: "지출 분석 탭이 있는가? (v1에 있었음 — v2 비용 탭으로 통합)" },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // 노심v2 — 손익분석 v2 (고급)
+  // ─────────────────────────────────────────────
+  {
+    id: "nosim-profit-loss-2",
+    title: "손익분석 v2 (고급 PnL)",
+    description: "/profit-loss-2 (v2 신규)",
+    service: "nosim",
+    subsections: [
+      {
+        id: "nosim-pnl2-basic",
+        title: "고급 PnL 분석",
+        items: [
+          { id: "nosim-pnl2-1", text: "손익분석 v2 페이지가 정상적으로 열리는가?" },
+          { id: "nosim-pnl2-2", text: "고급 손익 분석 데이터가 로딩되는가?" },
+          { id: "nosim-pnl2-3", text: "매출/비용/이익 차트가 정상 렌더링되는가?" },
+          { id: "nosim-pnl2-4", text: "기간 선택(월/분기)이 가능한가?" },
+          { id: "nosim-pnl2-5", text: "카테고리별 상세 분석이 가능한가?" },
+          { id: "nosim-pnl2-6", text: "데이터 로딩 중 스피너가 표시되는가?" },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // 노심v2 — 손익분석 v3 (비교)
+  // ─────────────────────────────────────────────
+  {
+    id: "nosim-profit-loss-3",
+    title: "손익분석 v3 (기간 비교)",
+    description: "/profit-loss-3 (v2 신규)",
+    service: "nosim",
+    subsections: [
+      {
+        id: "nosim-pnl3-basic",
+        title: "일일/주간/월간 비교",
+        items: [
+          { id: "nosim-pnl3-1", text: "손익분석 v3 페이지가 정상적으로 열리는가?" },
+          { id: "nosim-pnl3-2", text: "일일 비교 모드가 동작하는가?" },
+          { id: "nosim-pnl3-3", text: "주간 비교 모드가 동작하는가?" },
+          { id: "nosim-pnl3-4", text: "월간 비교 모드가 동작하는가?" },
+          { id: "nosim-pnl3-5", text: "기간 간 비교 차트가 정상 렌더링되는가?" },
+          { id: "nosim-pnl3-6", text: "이전 기간 대비 증감률이 표시되는가?" },
+          { id: "nosim-pnl3-7", text: "데이터 로딩 중 스피너가 표시되는가?" },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // 노심v2 — 직원 관리 (6탭)
+  // ─────────────────────────────────────────────
+  {
+    id: "nosim-staff",
+    title: "직원 관리",
+    description: "/staff (6탭: 근태현황/근무일정/출퇴근기록/급여/직원목록/체크리스트)",
+    service: "nosim",
+    subsections: [
+      {
+        id: "nosim-staff-tabs",
+        title: "상단 탭 (v2 신규)",
+        items: [
+          { id: "nosim-staff-1-1", text: "직원 관리 페이지가 정상적으로 열리는가?" },
+          { id: "nosim-staff-1-2", text: '고정 상단 탭 6개("근태현황" | "근무일정" | "출퇴근기록" | "급여" | "직원목록" | "체크리스트")가 보이는가?' },
+          { id: "nosim-staff-1-3", text: "각 탭 클릭 → 해당 패널이 표시되는가?" },
+          { id: "nosim-staff-1-4", text: "선택된 탭이 강조 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-staff-kanban-self",
+        title: "근태현황 — 직원 본인 화면",
+        items: [
+          { id: "nosim-staff-2-1", text: "아바타 원(ID별 색상)과 이름(크게, bold), 역할 라벨이 보이는가?" },
+          { id: "nosim-staff-2-2", text: '상태 플로우 바("출근 전" → "근무 중" → "퇴근 완료" → "조퇴·수정")가 보이는가?' },
+          { id: "nosim-staff-2-3", text: "현재 단계가 색상으로 강조되고 비활성 단계는 회색인가?" },
+          { id: "nosim-staff-2-4", text: "큰 시계 표시(HH:MM, monospace, 52px)가 보이는가?" },
+          { id: "nosim-staff-2-5", text: '출근 전: 검은 원형 버튼(155x155px) + ✌️ + "출근" 라벨이 보이는가?' },
+          { id: "nosim-staff-2-6", text: '근무 중: 초록 테두리 원형 버튼 + 👋 + "퇴근" 라벨이 보이는가?' },
+          { id: "nosim-staff-2-7", text: '퇴근 완료: 파란 원형 표시 + ✅ + "근무 완료" 라벨이 보이는가?' },
+          { id: "nosim-staff-2-8", text: "출근 버튼 클릭 → 출근 처리되고 상태가 변경되는가?" },
+          { id: "nosim-staff-2-9", text: "퇴근 버튼 클릭 → 퇴근 처리되고 상태가 변경되는가?" },
+          { id: "nosim-staff-2-10", text: '급여 정보 설정 시 "이번 달 예상 급여" 카드(금액 22px, bold + "원")가 표시되는가?' },
+        ],
+      },
+      {
+        id: "nosim-staff-kanban-manager",
+        title: "근태현황 — 사장님/관리자 화면",
+        items: [
+          { id: "nosim-staff-3-1", text: '상태 KPI 카드 3개("근무중" green-600, "퇴근완료" blue-600, "미출근" slate-400)가 보이는가?' },
+          { id: "nosim-staff-3-2", text: "각 KPI에 인원 수(2xl, bold, monospace)가 표시되는가?" },
+          { id: "nosim-staff-3-3", text: '"📊 오늘 근무 현황" 카드에 날짜와 직원 목록이 표시되는가?' },
+          { id: "nosim-staff-3-4", text: "각 직원: 아바타 + 이름 + 역할, 예정 시간, 출퇴근 시간(monospace), 상태 배지가 표시되는가?" },
+          { id: "nosim-staff-3-5", text: '지각 시 "⚠ {분}분 지각" 경고가 표시되는가?' },
+          { id: "nosim-staff-3-6", text: '관리자 액션 버튼("출근↑" 초록, "퇴근↓" 주황)이 보이고 동작하는가?' },
+          { id: "nosim-staff-3-7", text: '"📋 출퇴근 기록 (오늘 전체)" 테이블이 표시되는가?' },
+          { id: "nosim-staff-3-8", text: "직원 필터 드롭다운이 보이는가?" },
+          { id: "nosim-staff-3-9", text: "테이블 컬럼(직원 | 유형 | 시각 | 예정시각 | 지각/조퇴 | 삭제)이 표시되는가?" },
+          { id: "nosim-staff-3-10", text: "삭제 버튼이 동작하는가?" },
+        ],
+      },
+      {
+        id: "nosim-staff-schedule",
+        title: "근무일정 탭 (v2 신규)",
+        items: [
+          { id: "nosim-staff-4-1", text: "주/월 토글과 이전/다음(‹ ›) 네비게이션이 보이는가?" },
+          { id: "nosim-staff-4-2", text: '현재 날짜 범위와 "+ 근무 추가" 버튼이 보이는가? (사장님/관리자만)' },
+          { id: "nosim-staff-4-3", text: '"🕐 영업시간 설정" 카드에 "오픈 {시간} → 마감 {시간}"이 표시되는가?' },
+          { id: "nosim-staff-4-4", text: "수정 버튼 클릭 → 시간 입력란 + 취소/저장 버튼이 나타나는가?" },
+          { id: "nosim-staff-4-5", text: '주차 탭("1주차 {범위}" | "2주차 {범위}")이 보이는가?' },
+          { id: "nosim-staff-4-6", text: "범례: 직원별 색상 + 역할 라벨이 표시되는가?" },
+          { id: "nosim-staff-4-7", text: "일정 그리드: 좌측 직원명/역할, 상단 요일/날짜(오늘: 파란, 일: 빨강, 토: 파랑)가 표시되는가?" },
+          { id: "nosim-staff-4-8", text: "셀에 근무 카드(직원 색상 배경/테두리, 시작/종료 시간)가 표시되는가?" },
+          { id: "nosim-staff-4-9", text: '빈 셀에 "+" 버튼 → 근무 추가 바텀시트가 열리는가?' },
+          { id: "nosim-staff-4-10", text: '근무 추가 바텀시트: 직원 선택(색상 버튼), 날짜, 시간 입력(출근|퇴근), 시간 미리보기(파란), 확인/취소 버튼이 보이는가?' },
+          { id: "nosim-staff-4-11", text: '"📊 2주 근무 요약" 테이블(직원 | 직책 | 근무일 | 총근무 | 요일)이 표시되는가?' },
+        ],
+      },
+      {
+        id: "nosim-staff-records",
+        title: "출퇴근기록 탭",
+        items: [
+          { id: "nosim-staff-5-1", text: "출퇴근기록 탭이 동작하는가?" },
+          { id: "nosim-staff-5-2", text: "날짜별 출퇴근 기록이 테이블로 표시되는가?" },
+          { id: "nosim-staff-5-3", text: "직원별 출근/퇴근 시간(monospace)이 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-staff-payroll",
+        title: "급여 탭 (v2 신규)",
+        items: [
+          { id: "nosim-staff-6-1", text: "급여 탭이 동작하는가?" },
+          { id: "nosim-staff-6-2", text: "직원별 급여 정보가 표시되는가?" },
+          { id: "nosim-staff-6-3", text: "급여 입력/수정이 가능한가?" },
+        ],
+      },
+      {
+        id: "nosim-staff-list",
+        title: "직원목록 탭",
+        items: [
+          { id: "nosim-staff-7-1", text: "활성 직원 목록이 표시되는가?" },
+          { id: "nosim-staff-7-2", text: "각 직원: 이름, 역할, 연락처가 표시되는가?" },
+          { id: "nosim-staff-7-3", text: "직원 추가가 가능한가?" },
+          { id: "nosim-staff-7-4", text: "직원 삭제가 가능한가?" },
+          { id: "nosim-staff-7-5", text: "직원 정보 수정이 가능한가?" },
+        ],
+      },
+      {
+        id: "nosim-staff-v1-compare",
+        title: "v1 대비 누락 기능 확인",
+        items: [
+          { id: "nosim-staff-m1", text: "대기 중인 직원 목록이 있는가? (v1에 있었음 — v2 누락)" },
+          { id: "nosim-staff-m2", text: "사전 등록(휴대폰 번호)이 가능한가? (v1에 있었음 — v2 누락)" },
+          { id: "nosim-staff-m3", text: "직원 수정 별도 페이지(/staff/[id]/edit)가 있는가? (v1에 있었음 — v2 누락)" },
+          { id: "nosim-staff-m4", text: "매장 배정 변경이 가능한가? (v1에 있었음 — v2 누락)" },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // 노심v2 — 출퇴근 관리
+  // ─────────────────────────────────────────────
+  {
+    id: "nosim-attendance",
+    title: "출퇴근 관리",
+    description: "/attendance (v2 신규, 3탭: 오늘/기록/월간)",
+    service: "nosim",
+    subsections: [
+      {
+        id: "nosim-att-header",
+        title: "헤더",
+        items: [
+          { id: "nosim-att-1-1", text: '브레드크럼 "직원관리 › 출퇴근 기록"이 보이는가?' },
+          { id: "nosim-att-1-2", text: '"✅ 출퇴근 관리" 타이틀이 보이는가?' },
+          { id: "nosim-att-1-3", text: "날짜 라벨이 표시되는가?" },
+          { id: "nosim-att-1-4", text: '탭 네비게이션("오늘" | "기록" | "월간")이 보이는가?' },
+        ],
+      },
+      {
+        id: "nosim-att-today",
+        title: "오늘 탭",
+        items: [
+          { id: "nosim-att-2-1", text: 'KPI 카드 3개("근무중" green, "퇴근완료" blue, "미출근" gray)가 보이는가?' },
+          { id: "nosim-att-2-2", text: "각 KPI에 인원 수(2xl, bold, monospace)가 표시되는가?" },
+          { id: "nosim-att-2-3", text: '"📊 오늘 근무 현황" 카드에 직원별 상태가 표시되는가?' },
+          { id: "nosim-att-2-4", text: "각 직원: 아바타, 이름, 역할, 예정 시간(또는 \"미배정\")이 표시되는가?" },
+          { id: "nosim-att-2-5", text: "출퇴근 시간(monospace)이 표시되는가?" },
+          { id: "nosim-att-2-6", text: '지각 시 "⚠ {분}분 지각" 경고가 표시되는가?' },
+          { id: "nosim-att-2-7", text: "상태 배지(Tag 컴포넌트)가 표시되는가?" },
+          { id: "nosim-att-2-8", text: '사장님/관리자: "출근↑"(초록, 10px) / "퇴근↓"(주황) 액션 버튼이 동작하는가?' },
+          { id: "nosim-att-2-9", text: '"📋 출퇴근 기록 (오늘 전체)" 테이블이 표시되는가?' },
+          { id: "nosim-att-2-10", text: "직원 필터 드롭다운이 동작하는가?" },
+          { id: "nosim-att-2-11", text: "테이블 컬럼(직원 | 유형 | 시각 | 예정시각 | 지각/조퇴)이 표시되는가?" },
+          { id: "nosim-att-2-12", text: "색상 점 + 직원명, 출근/퇴근 태그, 시간(monospace)이 표시되는가?" },
+          { id: "nosim-att-2-13", text: "삭제 버튼(빨간 배경, red-600)이 동작하는가?" },
+        ],
+      },
+      {
+        id: "nosim-att-history",
+        title: "기록 탭",
+        items: [
+          { id: "nosim-att-3-1", text: '"날짜 선택" 카드에 날짜 입력(focus: blue-500)이 보이는가?' },
+          { id: "nosim-att-3-2", text: '"📋 {날짜} 출퇴근 기록" 헤더와 건수 배지가 표시되는가?' },
+          { id: "nosim-att-3-3", text: "테이블 컬럼(직원 | 출근 | 퇴근 | 근무시간)이 표시되는가?" },
+          { id: "nosim-att-3-4", text: "출근 시간(monospace, bold), 퇴근 시간(monospace), 근무시간(green-700)이 표시되는가?" },
+          { id: "nosim-att-3-5", text: '기록 없으면 "해당 날짜의 출퇴근 기록이 없습니다." 안내가 보이는가?' },
+          { id: "nosim-att-3-6", text: "삭제 버튼이 동작하는가?" },
+        ],
+      },
+      {
+        id: "nosim-att-monthly",
+        title: "월간 탭",
+        items: [
+          { id: "nosim-att-4-1", text: '"📅 이번달 근태 요약" 카드가 보이는가?' },
+          { id: "nosim-att-4-2", text: "이전(‹) | \"YYYY.MM\"(monospace) | 다음(›) 네비게이션이 동작하는가?" },
+          { id: "nosim-att-4-3", text: "요약 테이블 컬럼(직원 | 출근일수 | 지각횟수 | 결근 | 총근무시간)이 표시되는가?" },
+          { id: "nosim-att-4-4", text: "출근일수(blue-700, bold, monospace)가 표시되는가?" },
+          { id: "nosim-att-4-5", text: "지각횟수: 0 이상이면 red-600, 아니면 회색으로 표시되는가?" },
+          { id: "nosim-att-4-6", text: "총근무시간(초록 포맷)이 표시되는가?" },
+          { id: "nosim-att-4-7", text: '기록 없으면 "해당 월의 출근 기록이 없습니다." 안내가 보이는가?' },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // 노심v2 — 일정 관리 (근무자표)
+  // ─────────────────────────────────────────────
+  {
+    id: "nosim-schedule",
+    title: "근무자표",
+    description: "/schedule (v2 신규, 2주 단위)",
+    service: "nosim",
+    subsections: [
+      {
+        id: "nosim-sched-header",
+        title: "헤더 / 네비게이션",
+        items: [
+          { id: "nosim-sched-1-1", text: '브레드크럼 "직원관리 › 근무자표"가 보이는가?' },
+          { id: "nosim-sched-1-2", text: '"📆 근무자표" 타이틀이 보이는가?' },
+          { id: "nosim-sched-1-3", text: '날짜 범위 + "2주 단위 근무계획" 부제가 표시되는가?' },
+          { id: "nosim-sched-1-4", text: '"+ 근무 추가" 버튼이 보이는가? (사장님/관리자만)' },
+          { id: "nosim-sched-1-5", text: "이전(‹) | 날짜 범위(monospace) | 다음(›) 블록 네비게이션이 동작하는가?" },
+        ],
+      },
+      {
+        id: "nosim-sched-hours",
+        title: "영업시간 설정",
+        items: [
+          { id: "nosim-sched-2-1", text: '"🕐 영업시간 설정" 카드가 보이는가?' },
+          { id: "nosim-sched-2-2", text: '"오픈 {시간} → 마감 {시간}"이 표시되는가?' },
+          { id: "nosim-sched-2-3", text: "수정 버튼 → 시간 입력란(오픈/마감) + 취소/저장 버튼이 나타나는가?" },
+          { id: "nosim-sched-2-4", text: "저장 → 영업시간이 업데이트되는가?" },
+        ],
+      },
+      {
+        id: "nosim-sched-grid",
+        title: "일정 그리드",
+        items: [
+          { id: "nosim-sched-3-1", text: '주차 탭("1주차 {범위}" | "2주차 {범위}")이 보이고 전환되는가?' },
+          { id: "nosim-sched-3-2", text: "직원별 색상 범례가 역할 라벨과 함께 표시되는가?" },
+          { id: "nosim-sched-3-3", text: "그리드 좌측: 직원명 + 역할(작은 텍스트)이 표시되는가?" },
+          { id: "nosim-sched-3-4", text: "그리드 상단: 요일 라벨과 날짜(오늘: 파란 배경, 일: 빨강, 토: 파랑, 평일: 회색)가 표시되는가?" },
+          { id: "nosim-sched-3-5", text: "근무 셀: 직원 색상 배경(18% 불투명) + 테두리(50% 불투명) + 시작/종료 시간이 표시되는가?" },
+          { id: "nosim-sched-3-6", text: "근무 셀 클릭 → 삭제가 가능한가? (사장님/관리자)" },
+          { id: "nosim-sched-3-7", text: '빈 셀 "+" 클릭 → 근무 추가 바텀시트가 열리는가?' },
+        ],
+      },
+      {
+        id: "nosim-sched-add-shift",
+        title: "근무 추가 바텀시트",
+        items: [
+          { id: "nosim-sched-4-1", text: "드래그 핸들(흰 바) + \"근무 추가\" 헤더가 보이는가?" },
+          { id: "nosim-sched-4-2", text: "직원 선택 버튼(색상 구분, 선택: 테두리 색상)이 보이는가?" },
+          { id: "nosim-sched-4-3", text: "날짜 표시(색상 텍스트)가 보이는가?" },
+          { id: "nosim-sched-4-4", text: "시간 입력(출근 | 퇴근) time picker가 보이는가?" },
+          { id: "nosim-sched-4-5", text: "시간 미리보기(파란, monospace)가 표시되는가?" },
+          { id: "nosim-sched-4-6", text: "취소/확인 버튼(flex-1, 가운데 정렬)이 보이고 동작하는가?" },
+        ],
+      },
+      {
+        id: "nosim-sched-summary",
+        title: "2주 근무 요약",
+        items: [
+          { id: "nosim-sched-5-1", text: '"📊 2주 근무 요약" 테이블이 표시되는가?' },
+          { id: "nosim-sched-5-2", text: "컬럼(직원 | 직책 | 근무일 | 총근무 | 요일)이 표시되는가?" },
+          { id: "nosim-sched-5-3", text: "역할 배지, 근무일수, 총근무시간, 요일 약어가 정확히 표시되는가?" },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // 노심v2 — 점검 리스트 (체크리스트)
+  // ─────────────────────────────────────────────
+  {
+    id: "nosim-checklist",
+    title: "점검 리스트 (체크리스트)",
+    description: "/checklist (v2 신규)",
+    service: "nosim",
+    subsections: [
+      {
+        id: "nosim-check-filter",
+        title: "필터 바",
+        items: [
+          { id: "nosim-check-1-1", text: "점검 리스트 페이지가 정상적으로 열리는가?" },
+          { id: "nosim-check-1-2", text: '상태 필터 버튼("전체" | "개인" | "공통" | "미확인")이 보이는가?' },
+          { id: "nosim-check-1-3", text: "선택된 필터: blue-600 테두리 + 텍스트, 미선택: 투명인가?" },
+          { id: "nosim-check-1-4", text: "필터 전환 시 항목이 정상 필터링되는가?" },
+        ],
+      },
+      {
+        id: "nosim-check-owner-card",
+        title: "사장님/관리자 — 태스크 카드",
+        items: [
+          { id: "nosim-check-2-1", text: '시간대 배지가 색상으로 구분되는가? ("오픈": 남색, "오전": 앰버, "오후": 스카이, "마감": 슬레이트, "기타": 보라)' },
+          { id: "nosim-check-2-2", text: "태스크명(bold)이 표시되는가?" },
+          { id: "nosim-check-2-3", text: '태스크 타입 배지("개인": 바이올렛, "공통": 틸)가 표시되는가?' },
+          { id: "nosim-check-2-4", text: '상태 배지: "확인완료"(emerald, CheckCircle2), "미확인"(amber, Clock), "완료"(sky, Check), "배정됨"(slate, UserCheck), "미배정"(slate, AlertCircle)이 표시되는가?' },
+          { id: "nosim-check-2-5", text: "담당자 드롭다운이 보이고 변경 가능한가? (편집 권한자)" },
+        ],
+      },
+      {
+        id: "nosim-check-guide",
+        title: "기준 설정 (가이드)",
+        items: [
+          { id: "nosim-check-3-1", text: '"기준 설정"/"기준 수정" 토글 버튼이 보이는가?' },
+          { id: "nosim-check-3-2", text: '펼쳤을 때: "기준 설명" 입력, 이미지 업로드 버튼, 저장/취소 버튼이 보이는가?' },
+          { id: "nosim-check-3-3", text: "기준 이미지 썸네일(10x10, 클릭 가능)이 표시되는가? (설정된 경우)" },
+          { id: "nosim-check-3-4", text: "기준 설명 텍스트가 미리보기로 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-check-photo",
+        title: "사진 제출 / 검증",
+        items: [
+          { id: "nosim-check-4-1", text: '직원의 사진 제출 영역: 사진 미리보기(16x16) + "{이름} · {시간} 제출"이 표시되는가?' },
+          { id: "nosim-check-4-2", text: '"확인" 버튼(emerald-600)과 "반려" 버튼(red-50)이 보이는가?' },
+          { id: "nosim-check-4-3", text: '확인 처리 → "확인완료 {시간}" 텍스트가 표시되는가?' },
+          { id: "nosim-check-4-4", text: '반려 선택 → "반려 사유 입력…" 입력란 + "반려"(red-600) 버튼이 나타나는가?' },
+          { id: "nosim-check-4-5", text: "반려 사유가 있으면 빨간 텍스트로 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-check-staff-view",
+        title: "직원 — 태스크 카드",
+        items: [
+          { id: "nosim-check-5-1", text: "완료 원(emerald-500 채움/slate-300 테두리)이 상태에 따라 표시되는가?" },
+          { id: "nosim-check-5-2", text: "완료된 태스크는 취소선이 적용되는가?" },
+          { id: "nosim-check-5-3", text: "시간대 배지가 표시되는가?" },
+          { id: "nosim-check-5-4", text: "제출된 사진 썸네일(8x8) + 시간(작은 회색)이 표시되는가?" },
+          { id: "nosim-check-5-5", text: '상태: "확인완료"(초록) 또는 "반려: {사유}"(빨강)가 표시되는가?' },
+          { id: "nosim-check-5-6", text: '"기준 보기"(Eye 아이콘) 토글 → 가이드 이미지(16x16) + 설명 텍스트가 펼쳐지는가?' },
+          { id: "nosim-check-5-7", text: '"사진 제출"(Camera 아이콘) 버튼이 보이는가?' },
+          { id: "nosim-check-5-8", text: "이미 확인 완료된 항목은 사진 제출 버튼이 비활성화되는가?" },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // 노심v2 — 프로필/설정
+  // ─────────────────────────────────────────────
+  {
+    id: "nosim-profile",
+    title: "프로필/설정",
+    description: "/profile",
+    service: "nosim",
+    subsections: [
+      {
+        id: "nosim-prof-user",
+        title: "계정 정보",
+        items: [
+          { id: "nosim-prof-1-1", text: "프로필 페이지가 정상적으로 열리는가?" },
+          { id: "nosim-prof-1-2", text: "이메일이 표시되는가? (읽기 전용 또는 수정 가능)" },
+          { id: "nosim-prof-1-3", text: "이름이 표시되고 수정 가능한가?" },
+          { id: "nosim-prof-1-4", text: "전화번호가 표시되고 수정 가능한가?" },
+          { id: "nosim-prof-1-5", text: "역할 배지(읽기 전용)가 표시되는가?" },
+          { id: "nosim-prof-1-6", text: "아바타가 표시되는가? (있을 경우)" },
+        ],
+      },
+      {
+        id: "nosim-prof-password",
+        title: "비밀번호 변경 (v2 신규)",
+        items: [
+          { id: "nosim-prof-2-1", text: '"비밀번호 변경" 버튼이 보이는가?' },
+          { id: "nosim-prof-2-2", text: '클릭 → 모달: Lock 아이콘(blue-100 배경) + "비밀번호 변경" 타이틀이 보이는가?' },
+          { id: "nosim-prof-2-3", text: '"새 비밀번호를 입력해 주세요" 부제 + "기존 비밀번호는 사용할 수 없습니다." 안내가 보이는가?' },
+          { id: "nosim-prof-2-4", text: '"현재 비밀번호" 필수 입력란이 보이는가?' },
+          { id: "nosim-prof-2-5", text: '"비밀번호" 입력란(8자 이상, 숨김/표시 토글)이 보이는가?' },
+          { id: "nosim-prof-2-6", text: '"비밀번호 확인" 입력란(숨김/표시 토글)이 보이는가?' },
+          { id: "nosim-prof-2-7", text: '비밀번호 불일치 → "비밀번호가 일치하지 않습니다."(red-500) 표시되는가?' },
+          { id: "nosim-prof-2-8", text: '"확인" 버튼(전체 너비, 브랜드 색상)이 보이는가?' },
+          { id: "nosim-prof-2-9", text: '닫기 버튼(X, 우상단)이 동작하는가?' },
+          { id: "nosim-prof-2-10", text: '성공 시 → 초록 체크 아이콘 + "변경 완료" + "비밀번호가 변경되었습니다." 표시되는가?' },
+        ],
+      },
+      {
+        id: "nosim-prof-store",
+        title: "매장 정보",
+        items: [
+          { id: "nosim-prof-3-1", text: "매장명이 표시되고 수정 가능한가?" },
+          { id: "nosim-prof-3-2", text: "매장 타입 드롭다운(카페, 음식점, 편의점, 베이커리, 주점, 기타)이 보이는가?" },
+          { id: "nosim-prof-3-3", text: "주소가 표시되고 수정 가능한가?" },
+          { id: "nosim-prof-3-4", text: "매장 전화번호가 표시되고 수정 가능한가?" },
+          { id: "nosim-prof-3-5", text: "사업자등록번호가 표시되고 수정 가능한가?" },
+          { id: "nosim-prof-3-6", text: "영업시간(오픈/마감) 시간 입력이 보이는가?" },
+        ],
+      },
+      {
+        id: "nosim-prof-integration",
+        title: "연동 설정",
+        items: [
+          { id: "nosim-prof-4-1", text: '"연동 설정" 타이틀과 소개 텍스트가 보이는가?' },
+          { id: "nosim-prof-4-2", text: "각 연동 항목: 플랫폼 아이콘(48x48), 이름, 설명이 표시되는가?" },
+          { id: "nosim-prof-4-3", text: '상태 배지: "연결완료"(회색), "확인필요"(주황), "연결하기"(브랜드), "준비중"(회색, 비활성)이 표시되는가?' },
+          { id: "nosim-prof-4-4", text: '배달앱(배달의민족·요기요·쿠팡이츠·땡겨요) 연동이 보이는가?' },
+          { id: "nosim-prof-4-5", text: '"POS" (OKPOS 포스 연동)이 보이는가? (v2 신규)' },
+          { id: "nosim-prof-4-6", text: "카드매출, 홈택스, 카드, 계좌, 지도, 공과금, 신용점수가 \"준비중\"으로 표시되는가?" },
+        ],
+      },
+      {
+        id: "nosim-prof-connect",
+        title: "플랫폼 연결 / 해제",
+        items: [
+          { id: "nosim-prof-5-1", text: "연결하기 클릭 → 로그인 ID + 비밀번호(숨김/표시 토글) 입력 폼이 펼쳐지는가?" },
+          { id: "nosim-prof-5-2", text: '연결 확인 중 → "로그인 확인 중... (10~20초 소요)" 로딩 메시지가 표시되는가?' },
+          { id: "nosim-prof-5-3", text: '오류 시 → 빨간 텍스트 오류 메시지가 표시되는가?' },
+          { id: "nosim-prof-5-4", text: '성공 시 → "연결 확인 완료" (초록) 표시되는가?' },
+          { id: "nosim-prof-5-5", text: "연결된 상태: 마스킹된 로그인 ID + 수정/삭제 버튼이 보이는가?" },
+          { id: "nosim-prof-5-6", text: '"취소"(흰 테두리)와 "연결하기"/"확인 중..."(브랜드 색상) 버튼이 보이는가?' },
+        ],
+      },
+      {
+        id: "nosim-prof-pos",
+        title: "POS 연결 (v2 신규)",
+        items: [
+          { id: "nosim-prof-6-1", text: "OKPOS 연결 상태: \"OKPOS 웹 계정\" 헤더 + 초록 MonitorCheck 아이콘이 보이는가?" },
+          { id: "nosim-prof-6-2", text: '"연결완료" 상태와 마지막 동기화 정보("{날짜} · {건}건")가 표시되는가?' },
+          { id: "nosim-prof-6-3", text: '"지금 동기화" 버튼(브랜드 색상, RefreshCw 아이콘)이 동작하는가?' },
+          { id: "nosim-prof-6-4", text: '"연결 해제" 버튼(red-400)이 동작하는가?' },
+        ],
+      },
+      {
+        id: "nosim-prof-logout",
+        title: "로그아웃",
+        items: [
+          { id: "nosim-prof-7-1", text: "로그아웃 버튼이 보이는가?" },
+          { id: "nosim-prof-7-2", text: "로그아웃 클릭 → 로그인 페이지로 이동하는가?" },
+          { id: "nosim-prof-7-3", text: "로그아웃 후 보호된 페이지 접속 불가한가?" },
+        ],
+      },
+      {
+        id: "nosim-prof-v1-compare",
+        title: "v1 대비 누락 기능 확인",
+        items: [
+          { id: "nosim-prof-m1", text: "이메일 서버 연동(네이버 메일)이 있는가? (v1에 있었음 — v2 누락)" },
+          { id: "nosim-prof-m2", text: "메일/SMS 알림 설정이 있는가? (v1에 있었음 — v2 누락)" },
+          { id: "nosim-prof-m3", text: "앱 버전 표시가 있는가? (v1에 있었음 — v2 누락)" },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // 노심v2 — 하단 네비게이션
+  // ─────────────────────────────────────────────
+  {
+    id: "nosim-bottom-nav",
+    title: "하단 네비게이션",
+    description: "모바일 하단 탭바 (v2: 재고/손익/홈/직원/프로필)",
+    service: "nosim",
+    subsections: [
+      {
+        id: "nosim-nav-display",
+        title: "탭바 표시",
+        items: [
+          { id: "nosim-nav-1-1", text: "모바일에서 하단 탭 바가 화면 하단에 고정 표시되는가?" },
+          { id: "nosim-nav-1-2", text: "5개 탭이 균등 배치되는가?" },
+          { id: "nosim-nav-1-3", text: "재고 탭: Package 아이콘 + \"재고\" 라벨이 보이는가?" },
+          { id: "nosim-nav-1-4", text: "손익 탭: Calculator 아이콘 + \"손익\" 라벨이 보이는가?" },
+          { id: "nosim-nav-1-5", text: "홈 탭: Home 아이콘 + \"홈\" 라벨이 보이는가?" },
+          { id: "nosim-nav-1-6", text: "직원 탭: Users 아이콘 + \"직원\" 라벨이 보이는가?" },
+          { id: "nosim-nav-1-7", text: "프로필 탭: User 아이콘 + \"프로필\" 라벨이 보이는가?" },
+        ],
+      },
+      {
+        id: "nosim-nav-behavior",
+        title: "동작",
+        items: [
+          { id: "nosim-nav-2-1", text: "재고 탭 클릭 → /inventory로 이동하는가?" },
+          { id: "nosim-nav-2-2", text: "손익 탭 클릭 → /profit-loss로 이동하는가?" },
+          { id: "nosim-nav-2-3", text: "홈 탭 클릭 → /dashboard로 이동하는가?" },
+          { id: "nosim-nav-2-4", text: "직원 탭 클릭 → /staff로 이동하는가?" },
+          { id: "nosim-nav-2-5", text: "프로필 탭 클릭 → /profile로 이동하는가?" },
+          { id: "nosim-nav-2-6", text: "현재 페이지 탭이 강조 표시(색상 변경)되는가?" },
+          { id: "nosim-nav-2-7", text: "모든 페이지에서 하단 탭이 유지되는가?" },
+        ],
+      },
+      {
+        id: "nosim-nav-v1-compare",
+        title: "v1 대비 변경 확인",
+        items: [
+          { id: "nosim-nav-m1", text: "v1 탭(재고/활동/홈/발주/소통) → v2 탭(재고/손익/홈/직원/프로필)으로 변경 반영되었는가?" },
+          { id: "nosim-nav-m2", text: "활동 피드 탭이 제거되었는가? (v1에 있었음 — v2 삭제)" },
+          { id: "nosim-nav-m3", text: "발주 탭이 제거되었는가? (v1에 있었음 — v2에서 재고 페이지에 통합)" },
+          { id: "nosim-nav-m4", text: "소통(채팅) 탭이 제거되었는가? (v1에 있었음 — v2 삭제)" },
+        ],
+      },
+    ],
+  },
+
+  // ─────────────────────────────────────────────
+  // 노심v2 — 공통 UI / 반응형
+  // ─────────────────────────────────────────────
+  {
+    id: "nosim-common",
+    title: "공통 UI / 반응형",
+    description: "전체 페이지 공통 사항",
+    service: "nosim",
+    subsections: [
+      {
+        id: "nosim-common-responsive",
+        title: "반응형 레이아웃",
+        items: [
+          { id: "nosim-common-1-1", text: "모바일(~768px): 하단 탭 바가 표시되는가?" },
+          { id: "nosim-common-1-2", text: "데스크탑(768px~): 사이드바가 표시되는가?" },
+          { id: "nosim-common-1-3", text: "모든 페이지가 모바일에서 정상적으로 스크롤되는가?" },
+          { id: "nosim-common-1-4", text: "컨테이너 최대 너비(max-w-390px 등)가 적용되는가?" },
+        ],
+      },
+      {
+        id: "nosim-common-toast",
+        title: "토스트 / 로딩",
+        items: [
+          { id: "nosim-common-2-1", text: "성공 시 토스트가 표시되는가?" },
+          { id: "nosim-common-2-2", text: "오류 시 빨간 토스트/알림이 표시되는가?" },
+          { id: "nosim-common-2-3", text: "토스트가 자동으로 사라지는가?" },
+          { id: "nosim-common-2-4", text: "페이지 로딩 / API 호출 시 스피너가 표시되는가?" },
+          { id: "nosim-common-2-5", text: "버튼 제출 중 스피너 + 비활성화로 중복 클릭이 방지되는가?" },
+        ],
+      },
+      {
+        id: "nosim-common-permission",
+        title: "권한별 접근 제어",
+        items: [
+          { id: "nosim-common-3-1", text: "사장님(owner): 모든 기능에 접근 가능한가?" },
+          { id: "nosim-common-3-2", text: "관리자(manager): 품목 추가/수정, 스케줄 관리가 가능한가?" },
+          { id: "nosim-common-3-3", text: "직원(staff): 출퇴근, 재고 조회/조정, 체크리스트만 가능한가?" },
+          { id: "nosim-common-3-4", text: "알바(part_time): 제한된 기능만 접근 가능한가?" },
+          { id: "nosim-common-3-5", text: "권한 없는 기능 접근 시 적절한 안내가 나오는가?" },
+        ],
+      },
+      {
+        id: "nosim-common-design",
+        title: "디자인 시스템",
+        items: [
+          { id: "nosim-common-4-1", text: "버튼 스타일: Primary(indigo-600/브랜드, 흰 텍스트), Secondary(흰 배경, 테두리)가 일관되는가?" },
+          { id: "nosim-common-4-2", text: "입력란: rounded-xl, border-stone-200, focus: border-brand + ring이 일관되는가?" },
+          { id: "nosim-common-4-3", text: "카드: 흰 배경, border-stone-200, rounded-2xl이 일관되는가?" },
+          { id: "nosim-common-4-4", text: "브랜드 색상: 틸(#2A5C5C), 골드 그라디언트, indigo-600이 일관되게 적용되는가?" },
+          { id: "nosim-common-4-5", text: "숫자/시간: monospace 폰트가 적용되는가?" },
+        ],
+      },
+    ],
+  },
 ];
 
 export function getTotalItemCount(sections?: QASection[]): number {

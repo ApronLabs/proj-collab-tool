@@ -59,7 +59,7 @@ export default function SectionDetailPage() {
         <div className="px-4 py-3">
           <div className="flex items-center gap-2 mb-2">
             <button
-              onClick={() => router.push("/qa")}
+              onClick={() => router.back()}
               className="p-1 -ml-1 text-gray-500 hover:text-gray-900"
               aria-label="뒤로가기"
             >

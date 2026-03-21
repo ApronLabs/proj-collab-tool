@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, CircleDot, CheckCircle2, Circle, PauseCircle, RotateCcw, MessageSquare, Paperclip, Github } from 'lucide-react';
 import { useImprovements } from '@/lib/hooks/use-improvements';
@@ -60,10 +60,23 @@ function formatDate(dateStr: string) {
   return format(new Date(dateStr), 'M/d (EEE)', { locale: ko });
 }
 
+const FILTER_KEY = 'improvements-filters';
+
+function loadFilters() {
+  if (typeof window === 'undefined') return { status: '', priority: '', service: '' };
+  try {
+    return JSON.parse(localStorage.getItem(FILTER_KEY) || '{}');
+  } catch { return {}; }
+}
+
 export default function ImprovementsPage() {
-  const [status, setStatus] = useState('');
-  const [priority, setPriority] = useState('');
-  const [service, setService] = useState('');
+  const [status, setStatus] = useState(() => loadFilters().status || '');
+  const [priority, setPriority] = useState(() => loadFilters().priority || '');
+  const [service, setService] = useState(() => loadFilters().service || '');
+
+  useEffect(() => {
+    localStorage.setItem(FILTER_KEY, JSON.stringify({ status, priority, service }));
+  }, [status, priority, service]);
 
   const { data: improvements, isLoading } = useImprovements({
     status: status || undefined,
