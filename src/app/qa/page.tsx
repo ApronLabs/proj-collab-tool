@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { QA_SECTIONS, getSectionItemCount } from "./qa-data";
 import { useQACheck } from "./use-qa-check";
@@ -11,6 +11,8 @@ const SERVICE_OPTIONS = [
   { value: "barcode", label: "바코드 스캐너" },
   { value: "saleskeeper", label: "매출지킴이" },
 ] as const;
+
+const STORAGE_KEY = "qa-selected-service";
 
 function ProgressBar({ checked, total }: { checked: number; total: number }) {
   const pct = total === 0 ? 0 : Math.round((checked / total) * 100);
@@ -35,7 +37,16 @@ function ProgressBar({ checked, total }: { checked: number; total: number }) {
 export default function CollabPage() {
   const router = useRouter();
   const { getProgress, resetAll, loaded } = useQACheck();
-  const [selectedService, setSelectedService] = useState("saleskeeper");
+  const [selectedService, setSelectedService] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(STORAGE_KEY) || "nosim";
+    }
+    return "nosim";
+  });
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, selectedService);
+  }, [selectedService]);
 
   if (!loaded) {
     return (

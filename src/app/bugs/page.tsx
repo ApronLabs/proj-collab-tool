@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, CircleDot, CheckCircle2, Circle, PauseCircle, RotateCcw, MessageSquare, Paperclip, Github } from 'lucide-react';
 import { useBugs } from '@/lib/hooks/use-bugs';
@@ -60,10 +60,23 @@ function formatDate(dateStr: string) {
   return format(new Date(dateStr), 'M/d (EEE)', { locale: ko });
 }
 
+const FILTER_KEY = 'bugs-filters';
+
+function loadFilters() {
+  if (typeof window === 'undefined') return { status: '', priority: '', service: '' };
+  try {
+    return JSON.parse(localStorage.getItem(FILTER_KEY) || '{}');
+  } catch { return {}; }
+}
+
 export default function BugsPage() {
-  const [status, setStatus] = useState('');
-  const [priority, setPriority] = useState('');
-  const [service, setService] = useState('');
+  const [status, setStatus] = useState(() => loadFilters().status || '');
+  const [priority, setPriority] = useState(() => loadFilters().priority || '');
+  const [service, setService] = useState(() => loadFilters().service || '');
+
+  useEffect(() => {
+    localStorage.setItem(FILTER_KEY, JSON.stringify({ status, priority, service }));
+  }, [status, priority, service]);
 
   const { data: bugs, isLoading } = useBugs({
     status: status || undefined,
