@@ -31,6 +31,12 @@ const PRIORITY_OPTIONS = [
   { value: 'critical', label: '긴급' },
 ];
 
+const SERVICE_OPTIONS = [
+  { value: 'nosim', label: '노심' },
+  { value: 'collab', label: '협업도구' },
+  { value: 'barcode', label: '바코드 스캐너' },
+];
+
 export default function BugDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
@@ -69,6 +75,11 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
   const handlePriorityChange = async (priority: string) => {
     await updateBug.mutateAsync({ id, priority });
     toast.success('우선순위가 변경되었습니다');
+  };
+
+  const handleServiceChange = async (service: string) => {
+    await updateBug.mutateAsync({ id, service });
+    toast.success('서비스가 변경되었습니다');
   };
 
   const handleDelete = async () => {
@@ -154,6 +165,16 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
               className="h-8 px-2 text-sm border border-gray-200 rounded-md bg-white"
             >
               {PRIORITY_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">서비스</label>
+            <select
+              value={bug.service || 'nosim'}
+              onChange={(e) => handleServiceChange(e.target.value)}
+              className="h-8 px-2 text-sm border border-gray-200 rounded-md bg-white"
+            >
+              {SERVICE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </div>
           <div>

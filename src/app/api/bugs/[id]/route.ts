@@ -31,7 +31,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   const { id } = await params;
   const body = await request.json();
-  const { title, description, status, priority, repo, assigneeId } = body;
+  const { title, description, status, priority, service, repo, assigneeId } = body;
 
   const data: Record<string, unknown> = {};
   if (title !== undefined) data.title = title.trim();
@@ -45,6 +45,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
   }
   if (priority !== undefined) data.priority = priority;
+  if (service !== undefined) data.service = service || 'nosim';
   if (repo !== undefined) data.repo = repo || null;
   if (assigneeId !== undefined) data.assigneeId = assigneeId || null;
 

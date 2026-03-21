@@ -26,6 +26,19 @@ const PRIORITY_OPTIONS = [
   { value: 'low', label: '낮음' },
 ];
 
+const SERVICE_OPTIONS = [
+  { value: '', label: '전체' },
+  { value: 'nosim', label: '노심' },
+  { value: 'collab', label: '협업도구' },
+  { value: 'barcode', label: '바코드' },
+];
+
+const SERVICE_MAP: Record<string, { text: string; color: string }> = {
+  nosim: { text: '노심', color: 'text-blue-600 bg-blue-50' },
+  collab: { text: '협업도구', color: 'text-green-600 bg-green-50' },
+  barcode: { text: '바코드', color: 'text-orange-600 bg-orange-50' },
+};
+
 const STATUS_MAP: Record<string, { icon: typeof CircleDot; text: string; color: string }> = {
   open: { icon: CircleDot, text: '등록', color: 'text-green-600 bg-green-50' },
   in_progress: { icon: CircleDot, text: '진행중', color: 'text-yellow-600 bg-yellow-50' },
@@ -48,13 +61,15 @@ function formatDate(dateStr: string) {
 export default function BugsPage() {
   const [status, setStatus] = useState('');
   const [priority, setPriority] = useState('');
+  const [service, setService] = useState('');
 
   const { data: bugs, isLoading } = useBugs({
     status: status || undefined,
     priority: priority || undefined,
+    service: service || undefined,
   });
 
-  const hasActiveFilter = status || priority;
+  const hasActiveFilter = status || priority || service;
 
   return (
     <div className="space-y-4">
@@ -100,9 +115,25 @@ export default function BugsPage() {
             </button>
           ))}
         </div>
+        <span className="text-gray-300">|</span>
+        <div className="flex items-center gap-1">
+          {SERVICE_OPTIONS.map((o) => (
+            <button
+              key={o.value}
+              onClick={() => setService(service === o.value ? '' : o.value)}
+              className={`px-2.5 py-1 text-xs rounded-full font-medium transition-colors ${
+                service === o.value
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
         {hasActiveFilter && (
           <button
-            onClick={() => { setStatus(''); setPriority(''); }}
+            onClick={() => { setStatus(''); setPriority(''); setService(''); }}
             className="px-2 py-1 text-xs text-red-500 hover:text-red-700"
           >
             초기화
@@ -154,6 +185,11 @@ export default function BugsPage() {
                       우선순위:
                       <span className={`inline-flex px-1.5 py-0.5 rounded font-medium ${pl.color}`}>{pl.text}</span>
                     </span>
+                    {bug.service && SERVICE_MAP[bug.service] && (
+                      <span className={`inline-flex px-1.5 py-0.5 rounded font-medium ${SERVICE_MAP[bug.service].color}`}>
+                        {SERVICE_MAP[bug.service].text}
+                      </span>
+                    )}
                     <span>등록: {formatDate(bug.createdAt)}</span>
                     {bug.resolvedAt && (
                       <span>완료: {formatDate(bug.resolvedAt)}</span>
