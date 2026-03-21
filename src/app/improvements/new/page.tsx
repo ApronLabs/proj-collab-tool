@@ -13,7 +13,13 @@ import { FlowEditor } from '@/components/screen-ref/flow-editor';
 import { Monitor } from 'lucide-react';
 import type { PendingScreenRef } from '@/lib/types';
 
-const REPOS = ['ApronLabs/apronlabs-pwa', 'ApronLabs/barcode-scanner'];
+const SERVICES = [
+  { value: 'nosim', label: '노심' },
+  { value: 'collab', label: '협업도구' },
+  { value: 'barcode', label: '바코드 스캐너' },
+] as const;
+
+const REPOS = ['ApronLabs/proj-no-sim', 'ApronLabs/proj-collab-tool', 'ApronLabs/barcode-scanner'];
 const PRIORITIES = [
   { value: 'low', label: '낮음' },
   { value: 'medium', label: '보통' },
@@ -31,6 +37,7 @@ export default function NewImprovementPage() {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [service, setService] = useState('nosim');
   const [priority, setPriority] = useState('medium');
   const [repo, setRepo] = useState('');
   const [createGithub, setCreateGithub] = useState(false);
@@ -46,7 +53,7 @@ export default function NewImprovementPage() {
 
     setIsSubmitting(true);
     try {
-      const improvement = await createImprovement.mutateAsync({ title, description, priority, repo });
+      const improvement = await createImprovement.mutateAsync({ title, description, priority, service, repo });
 
       // Upload files, YouTube links, and screen references in parallel
       await Promise.all([
@@ -146,6 +153,19 @@ export default function NewImprovementPage() {
             {showScreenRef && (
               <FlowEditor steps={screenRefSteps} onChange={setScreenRefSteps} />
             )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">서비스</label>
+            <select
+              value={service}
+              onChange={(e) => setService(e.target.value)}
+              className="w-full h-11 px-4 text-base border border-gray-200 rounded-md bg-white focus:ring-2 focus:ring-brand focus:border-transparent"
+            >
+              {SERVICES.map((s) => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

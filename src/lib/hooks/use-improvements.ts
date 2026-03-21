@@ -6,6 +6,7 @@ interface ImprovementFilters {
   status?: string;
   priority?: string;
   repo?: string;
+  service?: string;
 }
 
 async function fetchJson(url: string, options?: RequestInit) {
@@ -22,6 +23,7 @@ export function useImprovements(filters?: ImprovementFilters) {
   if (filters?.status) params.set('status', filters.status);
   if (filters?.priority) params.set('priority', filters.priority);
   if (filters?.repo) params.set('repo', filters.repo);
+  if (filters?.service) params.set('service', filters.service);
 
   return useQuery({
     queryKey: ['improvements', filters],

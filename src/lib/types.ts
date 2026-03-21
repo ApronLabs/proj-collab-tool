@@ -19,6 +19,7 @@ export interface BugListItem {
   description: string | null;
   status: string;
   priority: string;
+  service?: string;
   repo: string | null;
   createdById: string;
   assigneeId: string | null;
@@ -128,6 +129,7 @@ export interface ImprovementListItem {
   description: string | null;
   status: string;
   priority: string;
+  service?: string;
   repo: string | null;
   createdById: string;
   assigneeId: string | null;
