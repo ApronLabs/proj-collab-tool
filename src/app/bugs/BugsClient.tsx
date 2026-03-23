@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Plus, Filter, CircleDot, CheckCircle2, Circle, PauseCircle, RotateCcw, MessageSquare, Paperclip, Github } from 'lucide-react';
+import { Plus, CircleDot, CheckCircle2, Circle, PauseCircle, RotateCcw, MessageSquare, Paperclip, Github } from 'lucide-react';
 import { useBugs } from '@/lib/hooks/use-bugs';
 import { Button, Card, SkeletonList } from '@/components/ui';
 import { formatDistanceToNow } from 'date-fns';
@@ -82,7 +82,6 @@ export default function BugsClient() {
   const { restoredState, isRestored, saveCurrentState } = usePageState({
     defaultState: {
       filters: { status: '', priority: '', service: '' },
-      extra: { showFilter: false },
     },
   });
 
@@ -90,9 +89,6 @@ export default function BugsClient() {
   const [status, setStatus] = useState(restoredState.filters?.status ?? '');
   const [priority, setPriority] = useState(restoredState.filters?.priority ?? '');
   const [service, setService] = useState(restoredState.filters?.service ?? '');
-  const [showFilter, setShowFilter] = useState(
-    (restoredState.extra?.showFilter as boolean) ?? false
-  );
 
   // --- 3) 스크롤 복원 ---
   useScrollRestore({
@@ -110,9 +106,8 @@ export default function BugsClient() {
   useEffect(() => {
     saveCurrentState({
       filters: { status, priority, service },
-      extra: { showFilter },
     });
-  }, [status, priority, service, showFilter, saveCurrentState]);
+  }, [status, priority, service, saveCurrentState]);
 
   // --- 5) 아이템 클릭 핸들러 ---
   const handleItemClick = useCallback(
@@ -126,58 +121,63 @@ export default function BugsClient() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">버그 트래커</h1>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon-sm" onClick={() => setShowFilter(!showFilter)}>
-            <Filter className="h-4 w-4" />
+        <Link href="/bugs/new">
+          <Button size="sm">
+            <Plus className="h-4 w-4" /> 새 버그
           </Button>
-          <Link href="/bugs/new">
-            <Button size="sm">
-              <Plus className="h-4 w-4" /> 새 버그
-            </Button>
-          </Link>
-        </div>
+        </Link>
       </div>
 
-      {showFilter && (
-        <Card padding="compact" className="flex flex-wrap gap-3">
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">상태</label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="h-8 px-2 text-sm border border-gray-200 rounded-md bg-white"
+      {/* Filter */}
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-1">
+          {STATUS_OPTIONS.map((o) => (
+            <button
+              key={o.value}
+              onClick={() => setStatus(status === o.value ? '' : o.value)}
+              className={`px-2.5 py-1 text-xs rounded-full font-medium transition-colors ${
+                status === o.value
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
             >
-              {STATUS_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">우선순위</label>
-            <select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-              className="h-8 px-2 text-sm border border-gray-200 rounded-md bg-white"
+              {o.label}
+            </button>
+          ))}
+        </div>
+        <span className="text-gray-300">|</span>
+        <div className="flex items-center gap-1">
+          {PRIORITY_OPTIONS.map((o) => (
+            <button
+              key={o.value}
+              onClick={() => setPriority(priority === o.value ? '' : o.value)}
+              className={`px-2.5 py-1 text-xs rounded-full font-medium transition-colors ${
+                priority === o.value
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
             >
-              {PRIORITY_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">서비스</label>
-            <select
-              value={service}
-              onChange={(e) => setService(e.target.value)}
-              className="h-8 px-2 text-sm border border-gray-200 rounded-md bg-white"
+              {o.label}
+            </button>
+          ))}
+        </div>
+        <span className="text-gray-300">|</span>
+        <div className="flex items-center gap-1">
+          {SERVICE_OPTIONS.map((o) => (
+            <button
+              key={o.value}
+              onClick={() => setService(service === o.value ? '' : o.value)}
+              className={`px-2.5 py-1 text-xs rounded-full font-medium transition-colors ${
+                service === o.value
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
             >
-              {SERVICE_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
-          </div>
-        </Card>
-      )}
+              {o.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {isLoading ? (
         <SkeletonList count={5} />
