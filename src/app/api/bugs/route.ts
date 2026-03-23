@@ -10,17 +10,20 @@ export async function GET(request: NextRequest) {
   const status = searchParams.get('status');
   const priority = searchParams.get('priority');
   const repo = searchParams.get('repo');
+  const service = searchParams.get('service');
 
   const where: Record<string, unknown> = {};
   if (status) where.status = status;
   if (priority) where.priority = priority;
   if (repo) where.repo = repo;
+  if (service) where.service = service;
 
   const bugs = await prisma.bug.findMany({
     where,
     include: {
       createdBy: { select: { id: true, name: true, avatarUrl: true } },
       assignee: { select: { id: true, name: true, avatarUrl: true } },
+      githubLinks: { select: { id: true, githubType: true, number: true, title: true, url: true, state: true }, orderBy: { createdAt: 'desc' } },
       _count: { select: { comments: true, attachments: true, githubLinks: true } },
     },
     orderBy: { createdAt: 'desc' },
@@ -34,7 +37,7 @@ export async function POST(request: NextRequest) {
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await request.json();
-  const { title, description, priority, repo, assigneeId } = body;
+  const { title, description, priority, service, repo, assigneeId } = body;
 
   if (!title?.trim()) {
     return NextResponse.json({ error: 'Title is required' }, { status: 400 });
@@ -45,6 +48,7 @@ export async function POST(request: NextRequest) {
       title: title.trim(),
       description: description?.trim() || null,
       priority: priority || 'medium',
+      service: service || 'nosim',
       repo: repo || null,
       createdById: userId,
       assigneeId: assigneeId || null,

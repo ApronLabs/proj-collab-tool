@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { ArrowLeft, ThumbsUp, Send, Trash2 } from 'lucide-react';
+import { ArrowLeft, ThumbsUp, Send, Trash2, Pencil, Check, X } from 'lucide-react';
 import { useIdea, useUpdateIdea, useDeleteIdea, useAddIdeaComment, useToggleVote, useUploadIdeaAttachment, useAddIdeaYoutubeLink, useDeleteIdeaAttachment } from '@/lib/hooks/use-ideas';
 import { Button, Card, Input } from '@/components/ui';
 import { useAuth } from '@/components/auth-context';
@@ -17,6 +17,8 @@ import type { IdeaDetail, IdeaComment as IdeaCommentType } from '@/lib/types';
 const STATUS_OPTIONS = [
   { value: 'proposed', label: '등록' },
   { value: 'in_progress', label: '진행중' },
+  { value: 'on_hold', label: '보류' },
+  { value: 're_request', label: '재요청' },
   { value: 'done', label: '완료' },
 ];
 
@@ -41,6 +43,10 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
   const deleteAttachment = useDeleteIdeaAttachment();
 
   const [comment, setComment] = useState('');
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editingDesc, setEditingDesc] = useState(false);
+  const [editDesc, setEditDesc] = useState('');
 
   if (isLoading) {
     return (
@@ -63,6 +69,21 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
   const handleDevStatusChange = async (devStatus: string) => {
     await updateIdea.mutateAsync({ id, devStatus: devStatus || null });
     toast.success('진행상태가 변경되었습니다');
+  };
+
+  const handleTitleSave = async () => {
+    if (!editTitle.trim() || editTitle.trim() === idea.title) { setEditingTitle(false); return; }
+    await updateIdea.mutateAsync({ id, title: editTitle.trim() });
+    setEditingTitle(false);
+    toast.success('제목이 수정되었습니다');
+  };
+
+  const handleDescSave = async () => {
+    const val = editDesc.trim();
+    if (val === (idea.description || '')) { setEditingDesc(false); return; }
+    await updateIdea.mutateAsync({ id, description: val || null });
+    setEditingDesc(false);
+    toast.success('설명이 수정되었습니다');
   };
 
   const handleDelete = async () => {
@@ -121,10 +142,30 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
     <div className="max-w-3xl mx-auto space-y-4">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <Link href="/ideas">
-          <Button variant="ghost" size="icon-sm"><ArrowLeft className="h-4 w-4" /></Button>
-        </Link>
-        <h1 className="text-lg font-bold text-gray-900 flex-1 truncate">{idea.title}</h1>
+        <Button variant="ghost" size="icon-sm" onClick={() => router.back()}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        {editingTitle ? (
+          <div className="flex-1 flex items-center gap-1">
+            <input
+              className="flex-1 text-lg font-bold text-gray-900 border border-brand rounded-md px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-brand"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleTitleSave(); if (e.key === 'Escape') setEditingTitle(false); }}
+              autoFocus
+            />
+            <Button variant="ghost" size="icon-sm" onClick={handleTitleSave}><Check className="h-4 w-4 text-green-600" /></Button>
+            <Button variant="ghost" size="icon-sm" onClick={() => setEditingTitle(false)}><X className="h-4 w-4 text-gray-400" /></Button>
+          </div>
+        ) : (
+          <h1
+            className="text-lg font-bold text-gray-900 flex-1 truncate cursor-pointer hover:text-brand group flex items-center gap-1"
+            onClick={() => { setEditTitle(idea.title); setEditingTitle(true); }}
+          >
+            {idea.title}
+            <Pencil className="h-3 w-3 text-gray-300 group-hover:text-brand shrink-0" />
+          </h1>
+        )}
         {user?.id === idea.createdBy.id && (
           <Button variant="ghost" size="icon-sm" onClick={handleDelete}>
             <Trash2 className="h-4 w-4 text-error" />
@@ -192,11 +233,33 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
       </Card>
 
       {/* Description */}
-      {idea.description && (
-        <Card>
-          <p className="text-sm text-gray-700 whitespace-pre-wrap">{idea.description}</p>
-        </Card>
-      )}
+      <Card>
+        {editingDesc ? (
+          <div className="space-y-2">
+            <textarea
+              className="w-full text-sm text-gray-700 border border-brand rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand resize-y min-h-[80px]"
+              value={editDesc}
+              onChange={(e) => setEditDesc(e.target.value)}
+              rows={4}
+              autoFocus
+            />
+            <div className="flex gap-1 justify-end">
+              <Button size="xs" onClick={handleDescSave}>저장</Button>
+              <Button variant="ghost" size="xs" onClick={() => setEditingDesc(false)}>취소</Button>
+            </div>
+          </div>
+        ) : (
+          <div
+            className="cursor-pointer hover:bg-gray-50 rounded-md p-1 -m-1 transition-colors group"
+            onClick={() => { setEditDesc(idea.description || ''); setEditingDesc(true); }}
+          >
+            <p className="text-sm text-gray-700 whitespace-pre-wrap">
+              {idea.description || <span className="text-gray-400 italic">설명을 추가하세요...</span>}
+            </p>
+            <Pencil className="h-3 w-3 text-gray-300 group-hover:text-brand mt-1" />
+          </div>
+        )}
+      </Card>
 
       {/* Media Section */}
       <MediaSection

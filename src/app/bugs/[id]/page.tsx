@@ -5,18 +5,22 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { ArrowLeft, Send, Github, Trash2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Send, Github, Trash2, ExternalLink, Pencil, Check, X } from 'lucide-react';
 import { useBug, useUpdateBug, useDeleteBug, useAddBugComment, useUploadBugAttachment, useAddBugYoutubeLink, useDeleteBugAttachment, useUnlinkBugGithub } from '@/lib/hooks/use-bugs';
+import { useScreenReferences } from '@/lib/hooks/use-screen-references';
 import { Button, Card, Input } from '@/components/ui';
 import { useAuth } from '@/components/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MediaSection } from '@/components/media/media-section';
+import { FlowViewer } from '@/components/screen-ref/flow-viewer';
 import Link from 'next/link';
 import type { BugDetail, BugComment as BugCommentType, BugGithubLink } from '@/lib/types';
 
 const STATUS_OPTIONS = [
   { value: 'open', label: '등록' },
   { value: 'in_progress', label: '진행중' },
+  { value: 'on_hold', label: '보류' },
+  { value: 're_request', label: '재요청' },
   { value: 'resolved', label: '완료' },
 ];
 
@@ -34,6 +38,13 @@ const PRIORITY_OPTIONS = [
   { value: 'critical', label: '긴급' },
 ];
 
+const SERVICE_OPTIONS = [
+  { value: 'nosim', label: '노심' },
+  { value: 'collab', label: '협업도구' },
+  { value: 'barcode', label: '바코드 스캐너' },
+  { value: 'saleskeeper', label: '매출지킴이' },
+];
+
 export default function BugDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
@@ -46,8 +57,13 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
   const addYoutubeLink = useAddBugYoutubeLink();
   const deleteAttachment = useDeleteBugAttachment();
   const unlinkGithub = useUnlinkBugGithub();
+  const { data: screenRefs } = useScreenReferences('bug', id);
 
   const [comment, setComment] = useState('');
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editingDesc, setEditingDesc] = useState(false);
+  const [editDesc, setEditDesc] = useState('');
 
   if (isLoading) {
     return (
@@ -76,6 +92,26 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
   const handleDevStatusChange = async (devStatus: string) => {
     await updateBug.mutateAsync({ id, devStatus: devStatus || null });
     toast.success('진행상태가 변경되었습니다');
+  };
+
+  const handleServiceChange = async (service: string) => {
+    await updateBug.mutateAsync({ id, service });
+    toast.success('서비스가 변경되었습니다');
+  };
+
+  const handleTitleSave = async () => {
+    if (!editTitle.trim() || editTitle.trim() === bug.title) { setEditingTitle(false); return; }
+    await updateBug.mutateAsync({ id, title: editTitle.trim() });
+    setEditingTitle(false);
+    toast.success('제목이 수정되었습니다');
+  };
+
+  const handleDescSave = async () => {
+    const val = editDesc.trim();
+    if (val === (bug.description || '')) { setEditingDesc(false); return; }
+    await updateBug.mutateAsync({ id, description: val || null });
+    setEditingDesc(false);
+    toast.success('설명이 수정되었습니다');
   };
 
   const handleDelete = async () => {
@@ -129,10 +165,30 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
     <div className="max-w-3xl mx-auto space-y-4">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <Link href="/bugs">
-          <Button variant="ghost" size="icon-sm"><ArrowLeft className="h-4 w-4" /></Button>
-        </Link>
-        <h1 className="text-lg font-bold text-gray-900 flex-1 truncate">{bug.title}</h1>
+        <Button variant="ghost" size="icon-sm" onClick={() => router.back()}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        {editingTitle ? (
+          <div className="flex-1 flex items-center gap-1">
+            <input
+              className="flex-1 text-lg font-bold text-gray-900 border border-brand rounded-md px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-brand"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleTitleSave(); if (e.key === 'Escape') setEditingTitle(false); }}
+              autoFocus
+            />
+            <Button variant="ghost" size="icon-sm" onClick={handleTitleSave}><Check className="h-4 w-4 text-green-600" /></Button>
+            <Button variant="ghost" size="icon-sm" onClick={() => setEditingTitle(false)}><X className="h-4 w-4 text-gray-400" /></Button>
+          </div>
+        ) : (
+          <h1
+            className="text-lg font-bold text-gray-900 flex-1 truncate cursor-pointer hover:text-brand group flex items-center gap-1"
+            onClick={() => { setEditTitle(bug.title); setEditingTitle(true); }}
+          >
+            {bug.title}
+            <Pencil className="h-3 w-3 text-gray-300 group-hover:text-brand shrink-0" />
+          </h1>
+        )}
         {user?.id === bug.createdBy.id && (
           <Button variant="ghost" size="icon-sm" onClick={handleDelete}>
             <Trash2 className="h-4 w-4 text-error" />
@@ -174,6 +230,16 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
             </select>
           </div>
           <div>
+            <label className="text-xs text-gray-500 block mb-1">서비스</label>
+            <select
+              value={bug.service || 'nosim'}
+              onChange={(e) => handleServiceChange(e.target.value)}
+              className="h-8 px-2 text-sm border border-gray-200 rounded-md bg-white"
+            >
+              {SERVICE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div>
             <label className="text-xs text-gray-500 block mb-1">작성자</label>
             <span className="text-sm text-gray-700">{bug.createdBy.name}</span>
           </div>
@@ -193,9 +259,38 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
       </Card>
 
       {/* Description */}
-      {bug.description && (
+      <Card>
+        {editingDesc ? (
+          <div className="space-y-2">
+            <textarea
+              className="w-full text-sm text-gray-700 border border-brand rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand resize-y min-h-[80px]"
+              value={editDesc}
+              onChange={(e) => setEditDesc(e.target.value)}
+              rows={4}
+              autoFocus
+            />
+            <div className="flex gap-1 justify-end">
+              <Button size="xs" onClick={handleDescSave}>저장</Button>
+              <Button variant="ghost" size="xs" onClick={() => setEditingDesc(false)}>취소</Button>
+            </div>
+          </div>
+        ) : (
+          <div
+            className="cursor-pointer hover:bg-gray-50 rounded-md p-1 -m-1 transition-colors group"
+            onClick={() => { setEditDesc(bug.description || ''); setEditingDesc(true); }}
+          >
+            <p className="text-sm text-gray-700 whitespace-pre-wrap">
+              {bug.description || <span className="text-gray-400 italic">설명을 추가하세요...</span>}
+            </p>
+            <Pencil className="h-3 w-3 text-gray-300 group-hover:text-brand mt-1" />
+          </div>
+        )}
+      </Card>
+
+      {/* Screen References / Flow */}
+      {screenRefs && screenRefs.length > 0 && (
         <Card>
-          <p className="text-sm text-gray-700 whitespace-pre-wrap">{bug.description}</p>
+          <FlowViewer screenRefs={screenRefs} />
         </Card>
       )}
 
