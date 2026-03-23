@@ -22,6 +22,13 @@ const STATUS_OPTIONS = [
   { value: 'done', label: '완료' },
 ];
 
+const DEV_STATUS_OPTIONS = [
+  { value: '', label: '미설정' },
+  { value: 'in_progress', label: '진행중' },
+  { value: 'pr_submitted', label: 'PR개발중' },
+  { value: 'done', label: '완료' },
+];
+
 export default function IdeaDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
@@ -57,6 +64,11 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
   const handleStatusChange = async (status: string) => {
     await updateIdea.mutateAsync({ id, status });
     toast.success('상태가 변경되었습니다');
+  };
+
+  const handleDevStatusChange = async (devStatus: string) => {
+    await updateIdea.mutateAsync({ id, devStatus: devStatus || null });
+    toast.success('진행상태가 변경되었습니다');
   };
 
   const handleTitleSave = async () => {
@@ -172,6 +184,16 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
               className="h-8 px-2 text-sm border border-gray-200 rounded-md bg-white"
             >
               {STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">진행상태</label>
+            <select
+              value={idea.devStatus ?? ''}
+              onChange={(e) => handleDevStatusChange(e.target.value)}
+              className="h-8 px-2 text-sm border border-gray-200 rounded-md bg-white"
+            >
+              {DEV_STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </div>
           <div>

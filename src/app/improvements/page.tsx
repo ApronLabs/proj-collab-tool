@@ -49,6 +49,16 @@ const STATUS_MAP: Record<string, { icon: typeof CircleDot; text: string; color: 
   resolved: { icon: CheckCircle2, text: '완료', color: 'text-purple-600 bg-purple-50' },
 };
 
+const devStatusBadge = (s: string | null) => {
+  if (!s) return null;
+  const map: Record<string, { text: string; color: string }> = {
+    in_progress: { text: '진행중', color: 'text-yellow-700 bg-yellow-50' },
+    pr_submitted: { text: 'PR개발중', color: 'text-blue-700 bg-blue-50' },
+    done: { text: '완료', color: 'text-green-700 bg-green-50' },
+  };
+  return map[s] || null;
+};
+
 const PRIORITY_MAP: Record<string, { text: string; color: string }> = {
   critical: { text: '긴급', color: 'text-red-600 bg-red-50' },
   high: { text: '높음', color: 'text-orange-600 bg-orange-50' },
@@ -68,6 +78,7 @@ function loadFilters() {
     return JSON.parse(localStorage.getItem(FILTER_KEY) || '{}');
   } catch { return {}; }
 }
+
 
 export default function ImprovementsPage() {
   const [status, setStatus] = useState(() => loadFilters().status || '');
@@ -167,6 +178,7 @@ export default function ImprovementsPage() {
           {(improvements as ImprovementListItem[]).map((item) => {
             const sl = STATUS_MAP[item.status] || { icon: Circle, text: item.status, color: 'text-gray-500 bg-gray-100' };
             const pl = PRIORITY_MAP[item.priority] || { text: item.priority, color: 'text-gray-500 bg-gray-100' };
+            const ds = devStatusBadge(item.devStatus);
             const StatusIcon = sl.icon;
 
             return (
@@ -203,6 +215,11 @@ export default function ImprovementsPage() {
                     {item.service && SERVICE_MAP[item.service] && (
                       <span className={`inline-flex px-1.5 py-0.5 rounded font-medium ${SERVICE_MAP[item.service].color}`}>
                         {SERVICE_MAP[item.service].text}
+                      </span>
+                    )}
+                    {ds && (
+                      <span className={`inline-flex px-1.5 py-0.5 rounded font-medium ${ds.color}`}>
+                        {ds.text}
                       </span>
                     )}
                     <span>등록: {formatDate(item.createdAt)}</span>

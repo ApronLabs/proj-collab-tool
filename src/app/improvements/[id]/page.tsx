@@ -24,6 +24,13 @@ const STATUS_OPTIONS = [
   { value: 'resolved', label: '완료' },
 ];
 
+const DEV_STATUS_OPTIONS = [
+  { value: '', label: '미설정' },
+  { value: 'in_progress', label: '진행중' },
+  { value: 'pr_submitted', label: 'PR개발중' },
+  { value: 'done', label: '완료' },
+];
+
 const PRIORITY_OPTIONS = [
   { value: 'low', label: '낮음' },
   { value: 'medium', label: '보통' },
@@ -80,6 +87,11 @@ export default function ImprovementDetailPage({ params }: { params: Promise<{ id
   const handlePriorityChange = async (priority: string) => {
     await updateImprovement.mutateAsync({ id, priority });
     toast.success('우선순위가 변경되었습니다');
+  };
+
+  const handleDevStatusChange = async (devStatus: string) => {
+    await updateImprovement.mutateAsync({ id, devStatus: devStatus || null });
+    toast.success('진행상태가 변경되었습니다');
   };
 
   const handleServiceChange = async (service: string) => {
@@ -205,6 +217,16 @@ export default function ImprovementDetailPage({ params }: { params: Promise<{ id
               className="h-8 px-2 text-sm border border-gray-200 rounded-md bg-white"
             >
               {PRIORITY_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">진행상태</label>
+            <select
+              value={improvement.devStatus ?? ''}
+              onChange={(e) => handleDevStatusChange(e.target.value)}
+              className="h-8 px-2 text-sm border border-gray-200 rounded-md bg-white"
+            >
+              {DEV_STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </div>
           <div>

@@ -48,6 +48,7 @@ model Bug {
   description String?   @db.Text
   status      String    @default("open") // open, in_progress, on_hold, re_request, resolved
   priority    String    @default("medium") // low, medium, high, critical
+  devStatus   String?   @map("dev_status") // in_progress, pr_submitted, done
   service     String?   @default("nosim") @db.VarChar(20)
   repo        String?   // e.g. "ApronLabs/apronlabs-pwa"
   createdById String    @map("created_by_id") @db.Uuid
@@ -129,6 +130,7 @@ model Idea {
   title       String
   description String?  @db.Text
   status      String   @default("proposed") // proposed, in_progress, on_hold, re_request, done
+  devStatus   String?  @map("dev_status") // in_progress, pr_submitted, done
   createdById String   @map("created_by_id") @db.Uuid
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
@@ -228,6 +230,7 @@ model Improvement {
   description String?   @db.Text
   status      String    @default("open") // open, in_progress, on_hold, re_request, resolved
   priority    String    @default("medium") // low, medium, high, critical
+  devStatus   String?   @map("dev_status") // in_progress, pr_submitted, done
   service     String?   @default("nosim") @db.VarChar(20)
   repo        String?   // e.g. "ApronLabs/apronlabs-pwa"
   createdById String    @map("created_by_id") @db.Uuid
