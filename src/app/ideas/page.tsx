@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus, Lightbulb, CheckCircle2, Circle, ThumbsUp, MessageCircle } from 'lucide-react';
+import { Plus, Lightbulb, CheckCircle2, Circle, PauseCircle, RotateCcw, ThumbsUp, MessageCircle } from 'lucide-react';
 import { useIdeas, useToggleVote } from '@/lib/hooks/use-ideas';
 import { Button, Card, SkeletonList } from '@/components/ui';
 import { formatDistanceToNow } from 'date-fns';
@@ -14,6 +14,8 @@ const STATUS_OPTIONS = [
   { value: '', label: '전체' },
   { value: 'proposed', label: '등록' },
   { value: 'in_progress', label: '진행중' },
+  { value: 'on_hold', label: '보류' },
+  { value: 're_request', label: '재요청' },
   { value: 'done', label: '완료' },
 ];
 
@@ -21,6 +23,8 @@ const statusIcon = (status: string) => {
   switch (status) {
     case 'proposed': return <Lightbulb className="h-4 w-4 text-green-500" />;
     case 'in_progress': return <Lightbulb className="h-4 w-4 text-yellow-500" />;
+    case 'on_hold': return <PauseCircle className="h-4 w-4 text-orange-500" />;
+    case 're_request': return <RotateCcw className="h-4 w-4 text-red-500" />;
     case 'done': return <CheckCircle2 className="h-4 w-4 text-purple-500" />;
     default: return <Circle className="h-4 w-4 text-gray-400" />;
   }
@@ -30,13 +34,36 @@ const statusLabel = (status: string) => {
   const map: Record<string, { text: string; color: string }> = {
     proposed: { text: '등록', color: 'text-green-600 bg-green-50' },
     in_progress: { text: '진행중', color: 'text-yellow-600 bg-yellow-50' },
+    on_hold: { text: '보류', color: 'text-orange-600 bg-orange-50' },
+    re_request: { text: '재요청', color: 'text-red-600 bg-red-50' },
     done: { text: '완료', color: 'text-purple-600 bg-purple-50' },
   };
   return map[status] || { text: status, color: 'text-gray-500 bg-gray-100' };
 };
 
+const devStatusBadge = (s: string | null) => {
+  if (!s) return null;
+  const map: Record<string, { text: string; color: string }> = {
+    in_progress: { text: '진행중', color: 'text-yellow-700 bg-yellow-50' },
+    pr_submitted: { text: 'PR개발중', color: 'text-blue-700 bg-blue-50' },
+    done: { text: '완료', color: 'text-green-700 bg-green-50' },
+  };
+  return map[s] || null;
+};
+
+const FILTER_KEY = 'ideas-filters';
+
 export default function IdeasPage() {
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    try { return JSON.parse(localStorage.getItem(FILTER_KEY) || '{}').status || ''; }
+    catch { return ''; }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(FILTER_KEY, JSON.stringify({ status }));
+  }, [status]);
+
   const { data: ideas, isLoading } = useIdeas({ status: status || undefined });
   const toggleVote = useToggleVote();
 
@@ -87,6 +114,7 @@ export default function IdeasPage() {
         <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
           {(ideas as IdeaListItem[]).map((idea) => {
             const sl = statusLabel(idea.status);
+            const ds = devStatusBadge(idea.devStatus);
 
             return (
               <Link key={idea.id} href={`/ideas/${idea.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
@@ -95,6 +123,7 @@ export default function IdeasPage() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-gray-900 truncate">{idea.title}</span>
                     <span className={`text-2xs px-1.5 py-0.5 rounded font-medium shrink-0 ${sl.color}`}>{sl.text}</span>
+                    {ds && <span className={`text-2xs px-1.5 py-0.5 rounded font-medium shrink-0 ${ds.color}`}>{ds.text}</span>}
                     {idea.tagLinks.map(({ tag }) => (
                       <span
                         key={tag.name}

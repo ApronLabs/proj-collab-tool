@@ -37,12 +37,13 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   const { id } = await params;
   const body = await request.json();
-  const { title, description, status, tagIds } = body;
+  const { title, description, status, devStatus, tagIds } = body;
 
   const data: Record<string, unknown> = {};
   if (title !== undefined) data.title = title.trim();
   if (description !== undefined) data.description = description?.trim() || null;
   if (status !== undefined) data.status = status;
+  if (devStatus !== undefined) data.devStatus = devStatus || null;
 
   if (tagIds !== undefined) {
     await prisma.ideaTagLink.deleteMany({ where: { ideaId: id } });

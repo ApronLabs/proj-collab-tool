@@ -43,16 +43,19 @@ model User {
 // Bug Tracker (collab schema)
 // ============================================================================
 model Bug {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title       String
-  description String?  @db.Text
-  status      String   @default("open") // open, in_progress, resolved
-  priority    String   @default("medium") // low, medium, high, critical
-  repo        String?  // e.g. "ApronLabs/apronlabs-pwa"
-  createdById String   @map("created_by_id") @db.Uuid
-  assigneeId  String?  @map("assignee_id") @db.Uuid
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+  description String?   @db.Text
+  status      String    @default("open") // open, in_progress, on_hold, re_request, resolved
+  priority    String    @default("medium") // low, medium, high, critical
+  devStatus   String?   @map("dev_status") // in_progress, pr_submitted, done
+  service     String?   @default("nosim") @db.VarChar(20)
+  repo        String?   // e.g. "ApronLabs/apronlabs-pwa"
+  createdById String    @map("created_by_id") @db.Uuid
+  assigneeId  String?   @map("assignee_id") @db.Uuid
+  resolvedAt  DateTime? @map("resolved_at") @db.Timestamptz()
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
   createdBy   User          @relation("BugCreatedBy", fields: [createdById], references: [id])
   assignee    User?         @relation("BugAssignedTo", fields: [assigneeId], references: [id])
@@ -62,6 +65,7 @@ model Bug {
 
   @@index([status])
   @@index([priority])
+  @@index([service])
   @@index([createdById])
   @@map("bugs")
   @@schema("collab")
@@ -125,7 +129,8 @@ model Idea {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title       String
   description String?  @db.Text
-  status      String   @default("proposed") // proposed, in_progress, done
+  status      String   @default("proposed") // proposed, in_progress, on_hold, re_request, done
+  devStatus   String?  @map("dev_status") // in_progress, pr_submitted, done
   createdById String   @map("created_by_id") @db.Uuid
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
@@ -220,16 +225,19 @@ model IdeaTagLink {
 // Improvements (collab schema)
 // ============================================================================
 model Improvement {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title       String
-  description String?  @db.Text
-  status      String   @default("open") // open, in_progress, resolved
-  priority    String   @default("medium") // low, medium, high, critical
-  repo        String?  // e.g. "ApronLabs/apronlabs-pwa"
-  createdById String   @map("created_by_id") @db.Uuid
-  assigneeId  String?  @map("assignee_id") @db.Uuid
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+  description String?   @db.Text
+  status      String    @default("open") // open, in_progress, on_hold, re_request, resolved
+  priority    String    @default("medium") // low, medium, high, critical
+  devStatus   String?   @map("dev_status") // in_progress, pr_submitted, done
+  service     String?   @default("nosim") @db.VarChar(20)
+  repo        String?   // e.g. "ApronLabs/apronlabs-pwa"
+  createdById String    @map("created_by_id") @db.Uuid
+  assigneeId  String?   @map("assignee_id") @db.Uuid
+  resolvedAt  DateTime? @map("resolved_at") @db.Timestamptz()
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
   createdBy   User                    @relation("ImprovementCreatedBy", fields: [createdById], references: [id])
   assignee    User?                   @relation("ImprovementAssignedTo", fields: [assigneeId], references: [id])
@@ -239,6 +247,7 @@ model Improvement {
 
   @@index([status])
   @@index([priority])
+  @@index([service])
   @@index([createdById])
   @@map("improvements")
   @@schema("collab")
@@ -273,6 +282,26 @@ model ImprovementAttachment {
 
   @@index([improvementId])
   @@map("improvement_attachments")
+  @@schema("collab")
+}
+
+// ============================================================================
+// Screen References (collab schema)
+// ============================================================================
+model ScreenReference {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  entityType    String   @map("entity_type")
+  entityId      String   @map("entity_id") @db.Uuid
+  stepOrder     Int      @map("step_order") @default(0)
+  pageId        String   @map("page_id")
+  screenshotUrl String?  @map("screenshot_url")
+  annotations   String?  @db.Text
+  description   String?  @db.Text
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@index([entityType, entityId])
+  @@index([entityId, stepOrder])
+  @@map("screen_references")
   @@schema("collab")
 }
 

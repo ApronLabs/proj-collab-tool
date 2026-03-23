@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Plus, Filter, CircleDot, CheckCircle2, Circle, MessageSquare, Paperclip } from 'lucide-react';
+import { Plus, Filter, CircleDot, CheckCircle2, Circle, PauseCircle, RotateCcw, MessageSquare, Paperclip, Github } from 'lucide-react';
 import { useBugs } from '@/lib/hooks/use-bugs';
 import { Button, Card, SkeletonList } from '@/components/ui';
 import { formatDistanceToNow } from 'date-fns';
@@ -16,8 +16,25 @@ const STATUS_OPTIONS = [
   { value: '', label: '전체' },
   { value: 'open', label: '등록' },
   { value: 'in_progress', label: '진행중' },
+  { value: 'on_hold', label: '보류' },
+  { value: 're_request', label: '재요청' },
   { value: 'resolved', label: '완료' },
 ];
+
+const SERVICE_OPTIONS = [
+  { value: '', label: '전체' },
+  { value: 'nosim', label: '노심' },
+  { value: 'collab', label: '협업도구' },
+  { value: 'barcode', label: '바코드' },
+  { value: 'saleskeeper', label: '매출지킴이' },
+];
+
+const SERVICE_MAP: Record<string, { text: string; color: string }> = {
+  nosim: { text: '노심', color: 'text-blue-600 bg-blue-50' },
+  collab: { text: '협업도구', color: 'text-green-600 bg-green-50' },
+  barcode: { text: '바코드', color: 'text-orange-600 bg-orange-50' },
+  saleskeeper: { text: '매출지킴이', color: 'text-pink-600 bg-pink-50' },
+};
 
 const PRIORITY_OPTIONS = [
   { value: '', label: '전체' },
@@ -31,6 +48,8 @@ const statusIcon = (status: string) => {
   switch (status) {
     case 'open': return <CircleDot className="h-4 w-4 text-green-500" />;
     case 'in_progress': return <CircleDot className="h-4 w-4 text-yellow-500" />;
+    case 'on_hold': return <PauseCircle className="h-4 w-4 text-orange-500" />;
+    case 're_request': return <RotateCcw className="h-4 w-4 text-red-500" />;
     case 'resolved': return <CheckCircle2 className="h-4 w-4 text-purple-500" />;
     default: return <Circle className="h-4 w-4 text-gray-400" />;
   }
@@ -62,7 +81,7 @@ export default function BugsClient() {
   // --- 1) 페이지 상태 복원 ---
   const { restoredState, isRestored, saveCurrentState } = usePageState({
     defaultState: {
-      filters: { status: '', priority: '' },
+      filters: { status: '', priority: '', service: '' },
       extra: { showFilter: false },
     },
   });
@@ -70,6 +89,7 @@ export default function BugsClient() {
   // --- 2) 로컬 상태 (복원된 값 또는 기본값) ---
   const [status, setStatus] = useState(restoredState.filters?.status ?? '');
   const [priority, setPriority] = useState(restoredState.filters?.priority ?? '');
+  const [service, setService] = useState(restoredState.filters?.service ?? '');
   const [showFilter, setShowFilter] = useState(
     (restoredState.extra?.showFilter as boolean) ?? false
   );
@@ -83,15 +103,16 @@ export default function BugsClient() {
   const { data: bugs, isLoading } = useBugs({
     status: status || undefined,
     priority: priority || undefined,
+    service: service || undefined,
   });
 
   // --- 4) 상태 변경 시마다 스냅샷 업데이트 ---
   useEffect(() => {
     saveCurrentState({
-      filters: { status, priority },
+      filters: { status, priority, service },
       extra: { showFilter },
     });
-  }, [status, priority, showFilter, saveCurrentState]);
+  }, [status, priority, service, showFilter, saveCurrentState]);
 
   // --- 5) 아이템 클릭 핸들러 ---
   const handleItemClick = useCallback(
@@ -143,6 +164,18 @@ export default function BugsClient() {
               ))}
             </select>
           </div>
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">서비스</label>
+            <select
+              value={service}
+              onChange={(e) => setService(e.target.value)}
+              className="h-8 px-2 text-sm border border-gray-200 rounded-md bg-white"
+            >
+              {SERVICE_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </div>
         </Card>
       )}
 
@@ -177,6 +210,9 @@ export default function BugsClient() {
                       <span className="text-sm font-semibold text-gray-900 break-words">{bug.title}</span>
                       <span className={`text-2xs px-1.5 py-0.5 rounded font-medium shrink-0 ${pl.color}`}>{pl.text}</span>
                       {ds && <span className={`text-2xs px-1.5 py-0.5 rounded font-medium shrink-0 ${ds.color}`}>{ds.text}</span>}
+                      {bug.service && SERVICE_MAP[bug.service] && (
+                        <span className={`text-2xs px-1.5 py-0.5 rounded font-medium shrink-0 ${SERVICE_MAP[bug.service].color}`}>{SERVICE_MAP[bug.service].text}</span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -214,6 +250,25 @@ export default function BugsClient() {
                     )}
                   </div>
                 </div>
+
+                {/* GitHub Links */}
+                {bug.githubLinks?.length > 0 && (
+                  <div className="flex flex-wrap gap-2 pl-6.5">
+                    {bug.githubLinks.map((link) => (
+                      <a
+                        key={link.id}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-md bg-gray-900 text-white hover:bg-gray-700 transition-colors"
+                      >
+                        <Github className="h-3 w-3" />
+                        {link.githubType === 'pr' ? 'PR' : 'Issue'} #{link.number}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </button>
             );
           })}

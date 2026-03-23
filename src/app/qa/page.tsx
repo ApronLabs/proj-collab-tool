@@ -1,8 +1,18 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { QA_SECTIONS, getSectionItemCount } from "./qa-data";
 import { useQACheck } from "./use-qa-check";
+
+const SERVICE_OPTIONS = [
+  { value: "nosim", label: "노심" },
+  { value: "collab", label: "협업도구" },
+  { value: "barcode", label: "바코드 스캐너" },
+  { value: "saleskeeper", label: "매출지킴이" },
+] as const;
+
+const STORAGE_KEY = "qa-selected-service";
 
 function ProgressBar({ checked, total }: { checked: number; total: number }) {
   const pct = total === 0 ? 0 : Math.round((checked / total) * 100);
@@ -27,6 +37,16 @@ function ProgressBar({ checked, total }: { checked: number; total: number }) {
 export default function CollabPage() {
   const router = useRouter();
   const { getProgress, resetAll, loaded } = useQACheck();
+  const [selectedService, setSelectedService] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(STORAGE_KEY) || "nosim";
+    }
+    return "nosim";
+  });
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, selectedService);
+  }, [selectedService]);
 
   if (!loaded) {
     return (
@@ -41,7 +61,10 @@ export default function CollabPage() {
     );
   }
 
-  const totalProgress = getProgress();
+  const filteredSections = QA_SECTIONS.filter(
+    (s) => (s.service || "saleskeeper") === selectedService
+  );
+  const totalProgress = getProgress(undefined, filteredSections);
 
   return (
     <div className="pb-20">
@@ -64,6 +87,24 @@ export default function CollabPage() {
             </button>
           )}
         </div>
+
+        {/* Service Selector */}
+        <div className="flex items-center gap-1 mb-2">
+          {SERVICE_OPTIONS.map((o) => (
+            <button
+              key={o.value}
+              onClick={() => setSelectedService(o.value)}
+              className={`px-3 py-1.5 text-xs rounded-full font-medium transition-colors ${
+                selectedService === o.value
+                  ? "bg-gray-900 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+
         <ProgressBar
           checked={totalProgress.checked}
           total={totalProgress.total}
@@ -75,7 +116,12 @@ export default function CollabPage() {
 
       {/* Section List */}
       <div className="p-4 space-y-2">
-        {QA_SECTIONS.map((section, idx) => {
+        {filteredSections.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-sm text-gray-500">아직 QA 항목이 없습니다</p>
+          </div>
+        ) : null}
+        {filteredSections.map((section, idx) => {
           const progress = getProgress(section);
           const itemCount = getSectionItemCount(section);
           const isDone = progress.checked === progress.total;

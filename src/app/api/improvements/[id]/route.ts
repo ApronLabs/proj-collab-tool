@@ -31,13 +31,22 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   const { id } = await params;
   const body = await request.json();
-  const { title, description, status, priority, repo, assigneeId } = body;
+  const { title, description, status, priority, devStatus, service, repo, assigneeId } = body;
 
   const data: Record<string, unknown> = {};
   if (title !== undefined) data.title = title.trim();
   if (description !== undefined) data.description = description?.trim() || null;
-  if (status !== undefined) data.status = status;
+  if (status !== undefined) {
+    data.status = status;
+    if (status === 'resolved') {
+      data.resolvedAt = new Date();
+    } else {
+      data.resolvedAt = null;
+    }
+  }
   if (priority !== undefined) data.priority = priority;
+  if (devStatus !== undefined) data.devStatus = devStatus || null;
+  if (service !== undefined) data.service = service || 'nosim';
   if (repo !== undefined) data.repo = repo || null;
   if (assigneeId !== undefined) data.assigneeId = assigneeId || null;
 

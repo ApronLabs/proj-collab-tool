@@ -5,20 +5,30 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { Send, Github, Trash2, ExternalLink, Pencil, X, Check } from 'lucide-react';
+import { Send, Github, Trash2, ExternalLink, Pencil, Check, X } from 'lucide-react';
 import { useBug, useUpdateBug, useDeleteBug, useAddBugComment, useUploadBugAttachment, useAddBugYoutubeLink, useDeleteBugAttachment, useUnlinkBugGithub } from '@/lib/hooks/use-bugs';
+import { useScreenReferences } from '@/lib/hooks/use-screen-references';
 import { Button, Card, Input } from '@/components/ui';
-import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/components/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MediaSection } from '@/components/media/media-section';
 import { BackButton } from '@/components/BackButton';
+import { FlowViewer } from '@/components/screen-ref/flow-viewer';
 import type { BugDetail, BugComment as BugCommentType, BugGithubLink } from '@/lib/types';
 
 const STATUS_OPTIONS = [
   { value: 'open', label: '등록' },
   { value: 'in_progress', label: '진행중' },
+  { value: 'on_hold', label: '보류' },
+  { value: 're_request', label: '재요청' },
   { value: 'resolved', label: '완료' },
+];
+
+const DEV_STATUS_OPTIONS = [
+  { value: '', label: '미설정' },
+  { value: 'in_progress', label: '진행중' },
+  { value: 'pr_submitted', label: 'PR개발중' },
+  { value: 'done', label: '완료' },
 ];
 
 const PRIORITY_OPTIONS = [
@@ -26,6 +36,13 @@ const PRIORITY_OPTIONS = [
   { value: 'medium', label: '보통' },
   { value: 'high', label: '높음' },
   { value: 'critical', label: '긴급' },
+];
+
+const SERVICE_OPTIONS = [
+  { value: 'nosim', label: '노심' },
+  { value: 'collab', label: '협업도구' },
+  { value: 'barcode', label: '바코드 스캐너' },
+  { value: 'saleskeeper', label: '매출지킴이' },
 ];
 
 export default function BugDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -40,11 +57,13 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
   const addYoutubeLink = useAddBugYoutubeLink();
   const deleteAttachment = useDeleteBugAttachment();
   const unlinkGithub = useUnlinkBugGithub();
+  const { data: screenRefs } = useScreenReferences('bug', id);
 
   const [comment, setComment] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
+  const [editingTitle, setEditingTitle] = useState(false);
   const [editTitle, setEditTitle] = useState('');
-  const [editDescription, setEditDescription] = useState('');
+  const [editingDesc, setEditingDesc] = useState(false);
+  const [editDesc, setEditDesc] = useState('');
 
   if (isLoading) {
     return (
@@ -70,17 +89,29 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
     toast.success('우선순위가 변경되었습니다');
   };
 
-  const handleEditStart = () => {
-    setEditTitle(bug.title);
-    setEditDescription(bug.description || '');
-    setIsEditing(true);
+  const handleDevStatusChange = async (devStatus: string) => {
+    await updateBug.mutateAsync({ id, devStatus: devStatus || null });
+    toast.success('진행상태가 변경되었습니다');
   };
 
-  const handleEditSave = async () => {
-    if (!editTitle.trim()) return;
-    await updateBug.mutateAsync({ id, title: editTitle, description: editDescription });
-    toast.success('수정되었습니다');
-    setIsEditing(false);
+  const handleServiceChange = async (service: string) => {
+    await updateBug.mutateAsync({ id, service });
+    toast.success('서비스가 변경되었습니다');
+  };
+
+  const handleTitleSave = async () => {
+    if (!editTitle.trim() || editTitle.trim() === bug.title) { setEditingTitle(false); return; }
+    await updateBug.mutateAsync({ id, title: editTitle.trim() });
+    setEditingTitle(false);
+    toast.success('제목이 수정되었습니다');
+  };
+
+  const handleDescSave = async () => {
+    const val = editDesc.trim();
+    if (val === (bug.description || '')) { setEditingDesc(false); return; }
+    await updateBug.mutateAsync({ id, description: val || null });
+    setEditingDesc(false);
+    toast.success('설명이 수정되었습니다');
   };
 
   const handleDelete = async () => {
@@ -141,36 +172,31 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
         >
           ←
         </BackButton>
-        {isEditing ? (
-          <Input
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-            className="flex-1 text-lg font-bold"
-            autoFocus
-          />
+        {editingTitle ? (
+          <div className="flex-1 flex items-center gap-1">
+            <input
+              className="flex-1 text-lg font-bold text-gray-900 border border-brand rounded-md px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-brand"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleTitleSave(); if (e.key === 'Escape') setEditingTitle(false); }}
+              autoFocus
+            />
+            <Button variant="ghost" size="icon-sm" onClick={handleTitleSave}><Check className="h-4 w-4 text-green-600" /></Button>
+            <Button variant="ghost" size="icon-sm" onClick={() => setEditingTitle(false)}><X className="h-4 w-4 text-gray-400" /></Button>
+          </div>
         ) : (
-          <h1 className="text-lg font-bold text-gray-900 flex-1 truncate">{bug.title}</h1>
+          <h1
+            className="text-lg font-bold text-gray-900 flex-1 truncate cursor-pointer hover:text-brand group flex items-center gap-1"
+            onClick={() => { setEditTitle(bug.title); setEditingTitle(true); }}
+          >
+            {bug.title}
+            <Pencil className="h-3 w-3 text-gray-300 group-hover:text-brand shrink-0" />
+          </h1>
         )}
         {user?.id === bug.createdBy.id && (
-          isEditing ? (
-            <>
-              <Button variant="ghost" size="icon-sm" onClick={handleEditSave} isLoading={updateBug.isPending}>
-                <Check className="h-4 w-4 text-success" />
-              </Button>
-              <Button variant="ghost" size="icon-sm" onClick={() => setIsEditing(false)}>
-                <X className="h-4 w-4 text-gray-500" />
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant="ghost" size="icon-sm" onClick={handleEditStart}>
-                <Pencil className="h-4 w-4 text-gray-500" />
-              </Button>
-              <Button variant="ghost" size="icon-sm" onClick={handleDelete}>
-                <Trash2 className="h-4 w-4 text-error" />
-              </Button>
-            </>
-          )
+          <Button variant="ghost" size="icon-sm" onClick={handleDelete}>
+            <Trash2 className="h-4 w-4 text-error" />
+          </Button>
         )}
       </div>
 
@@ -198,6 +224,26 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
             </select>
           </div>
           <div>
+            <label className="text-xs text-gray-500 block mb-1">진행상태</label>
+            <select
+              value={bug.devStatus ?? ''}
+              onChange={(e) => handleDevStatusChange(e.target.value)}
+              className="h-8 px-2 text-sm border border-gray-200 rounded-md bg-white"
+            >
+              {DEV_STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">서비스</label>
+            <select
+              value={bug.service || 'nosim'}
+              onChange={(e) => handleServiceChange(e.target.value)}
+              className="h-8 px-2 text-sm border border-gray-200 rounded-md bg-white"
+            >
+              {SERVICE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div>
             <label className="text-xs text-gray-500 block mb-1">작성자</label>
             <span className="text-sm text-gray-700">{bug.createdBy.name}</span>
           </div>
@@ -217,21 +263,40 @@ export default function BugDetailPage({ params }: { params: Promise<{ id: string
       </Card>
 
       {/* Description */}
-      {isEditing ? (
+      <Card>
+        {editingDesc ? (
+          <div className="space-y-2">
+            <textarea
+              className="w-full text-sm text-gray-700 border border-brand rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand resize-y min-h-[80px]"
+              value={editDesc}
+              onChange={(e) => setEditDesc(e.target.value)}
+              rows={4}
+              autoFocus
+            />
+            <div className="flex gap-1 justify-end">
+              <Button size="xs" onClick={handleDescSave}>저장</Button>
+              <Button variant="ghost" size="xs" onClick={() => setEditingDesc(false)}>취소</Button>
+            </div>
+          </div>
+        ) : (
+          <div
+            className="cursor-pointer hover:bg-gray-50 rounded-md p-1 -m-1 transition-colors group"
+            onClick={() => { setEditDesc(bug.description || ''); setEditingDesc(true); }}
+          >
+            <p className="text-sm text-gray-700 whitespace-pre-wrap">
+              {bug.description || <span className="text-gray-400 italic">설명을 추가하세요...</span>}
+            </p>
+            <Pencil className="h-3 w-3 text-gray-300 group-hover:text-brand mt-1" />
+          </div>
+        )}
+      </Card>
+
+      {/* Screen References / Flow */}
+      {screenRefs && screenRefs.length > 0 && (
         <Card>
-          <Textarea
-            label="설명"
-            value={editDescription}
-            onChange={(e) => setEditDescription(e.target.value)}
-            rows={6}
-            placeholder="설명을 입력하세요"
-          />
+          <FlowViewer screenRefs={screenRefs} />
         </Card>
-      ) : bug.description ? (
-        <Card>
-          <p className="text-sm text-gray-700 whitespace-pre-wrap">{bug.description}</p>
-        </Card>
-      ) : null}
+      )}
 
       {/* GitHub Links */}
       {bug.githubLinks?.length > 0 && (
