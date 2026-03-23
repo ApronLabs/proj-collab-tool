@@ -1,15 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, CircleDot, CheckCircle2, Circle, PauseCircle, RotateCcw, MessageSquare, Paperclip, Github } from 'lucide-react';
 import { useBugs } from '@/lib/hooks/use-bugs';
 import { Button, Card, SkeletonList } from '@/components/ui';
-import { formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import type { BugListItem } from '@/lib/types';
 import { usePageState } from '@/lib/hooks/usePageState';
-import { useHistoryManager } from '@/lib/hooks/useHistoryManager';
 import { useScrollRestore } from '@/lib/hooks/useScrollRestore';
 
 const STATUS_OPTIONS = [
@@ -44,26 +43,24 @@ const PRIORITY_OPTIONS = [
   { value: 'low', label: '낮음' },
 ];
 
-const statusIcon = (status: string) => {
-  switch (status) {
-    case 'open': return <CircleDot className="h-4 w-4 text-green-500" />;
-    case 'in_progress': return <CircleDot className="h-4 w-4 text-yellow-500" />;
-    case 'on_hold': return <PauseCircle className="h-4 w-4 text-orange-500" />;
-    case 're_request': return <RotateCcw className="h-4 w-4 text-red-500" />;
-    case 'resolved': return <CheckCircle2 className="h-4 w-4 text-purple-500" />;
-    default: return <Circle className="h-4 w-4 text-gray-400" />;
-  }
+const STATUS_MAP: Record<string, { icon: typeof CircleDot; text: string; color: string }> = {
+  open: { icon: CircleDot, text: '등록', color: 'text-green-600 bg-green-50' },
+  in_progress: { icon: CircleDot, text: '진행중', color: 'text-yellow-600 bg-yellow-50' },
+  on_hold: { icon: PauseCircle, text: '보류', color: 'text-orange-600 bg-orange-50' },
+  re_request: { icon: RotateCcw, text: '재요청', color: 'text-red-600 bg-red-50' },
+  resolved: { icon: CheckCircle2, text: '완료', color: 'text-purple-600 bg-purple-50' },
 };
 
-const priorityLabel = (p: string) => {
-  const map: Record<string, { text: string; color: string }> = {
-    critical: { text: '긴급', color: 'text-red-600 bg-red-50' },
-    high: { text: '높음', color: 'text-orange-600 bg-orange-50' },
-    medium: { text: '보통', color: 'text-blue-600 bg-blue-50' },
-    low: { text: '낮음', color: 'text-gray-500 bg-gray-100' },
-  };
-  return map[p] || { text: p, color: 'text-gray-500 bg-gray-100' };
+const PRIORITY_MAP: Record<string, { text: string; color: string }> = {
+  critical: { text: '긴급', color: 'text-red-600 bg-red-50' },
+  high: { text: '높음', color: 'text-orange-600 bg-orange-50' },
+  medium: { text: '보통', color: 'text-blue-600 bg-blue-50' },
+  low: { text: '낮음', color: 'text-gray-500 bg-gray-100' },
 };
+
+function formatDate(dateStr: string) {
+  return format(new Date(dateStr), 'M/d (EEE)', { locale: ko });
+}
 
 const devStatusBadge = (s: string | null) => {
   if (!s) return null;
@@ -76,8 +73,6 @@ const devStatusBadge = (s: string | null) => {
 };
 
 export default function BugsClient() {
-  const { navigateToWithMark } = useHistoryManager();
-
   // --- 1) 페이지 상태 복원 ---
   const { restoredState, isRestored, saveCurrentState } = usePageState({
     defaultState: {
@@ -109,13 +104,6 @@ export default function BugsClient() {
     });
   }, [status, priority, service, saveCurrentState]);
 
-  // --- 5) 아이템 클릭 핸들러 ---
-  const handleItemClick = useCallback(
-    (id: string) => {
-      navigateToWithMark(`/bugs/${id}`, id);
-    },
-    [navigateToWithMark]
-  );
 
   return (
     <div className="space-y-4">
@@ -186,74 +174,61 @@ export default function BugsClient() {
           <p className="text-gray-500 text-sm">등록된 버그가 없습니다</p>
         </Card>
       ) : (
-        <div className="space-y-2">
+        <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
           {(bugs as BugListItem[]).map((bug) => {
-            const pl = priorityLabel(bug.priority);
+            const sl = STATUS_MAP[bug.status] || { icon: Circle, text: bug.status, color: 'text-gray-500 bg-gray-100' };
+            const pl = PRIORITY_MAP[bug.priority] || { text: bug.priority, color: 'text-gray-500 bg-gray-100' };
             const ds = devStatusBadge(bug.devStatus);
-            const isLastClicked = bug.id === restoredState.lastClickedItemId;
+            const StatusIcon = sl.icon;
 
             return (
-              <button
-                key={bug.id}
-                onClick={() => handleItemClick(bug.id)}
-                className={`w-full text-left rounded-lg border transition-colors px-4 py-4 space-y-2.5 ${
-                  isLastClicked
-                    ? 'bg-brand/5 border-brand/30'
-                    : 'bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                {/* 상단: 상태 아이콘 + 제목 + 뱃지들 */}
-                <div className="flex items-start gap-2.5">
-                  <span className="mt-0.5 shrink-0">{statusIcon(bug.status)}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <span className="text-sm font-semibold text-gray-900 break-words">{bug.title}</span>
-                      <span className={`text-2xs px-1.5 py-0.5 rounded font-medium shrink-0 ${pl.color}`}>{pl.text}</span>
-                      {ds && <span className={`text-2xs px-1.5 py-0.5 rounded font-medium shrink-0 ${ds.color}`}>{ds.text}</span>}
-                      {bug.service && SERVICE_MAP[bug.service] && (
-                        <span className={`text-2xs px-1.5 py-0.5 rounded font-medium shrink-0 ${SERVICE_MAP[bug.service].color}`}>{SERVICE_MAP[bug.service].text}</span>
+              <div key={bug.id} className="px-4 py-3 hover:bg-gray-50 transition-colors">
+                <Link href={`/bugs/${bug.id}`} className="block">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="text-sm font-medium text-gray-900">{bug.title}</span>
+                    <div className="flex items-center gap-3 shrink-0 text-xs text-gray-400">
+                      {bug._count?.comments > 0 && (
+                        <span className="flex items-center gap-1">
+                          <MessageSquare className="h-3.5 w-3.5" />
+                          {bug._count.comments}
+                        </span>
+                      )}
+                      {bug._count?.attachments > 0 && (
+                        <span className="flex items-center gap-1">
+                          <Paperclip className="h-3.5 w-3.5" />
+                          {bug._count.attachments}
+                        </span>
                       )}
                     </div>
                   </div>
-                </div>
-
-                {/* 설명 미리보기 */}
-                {bug.description && (
-                  <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 pl-6.5">
-                    {bug.description}
-                  </p>
-                )}
-
-                {/* 하단: 메타 정보 */}
-                <div className="flex items-center justify-between pl-6.5">
-                  <div className="flex items-center gap-3 text-xs text-gray-400">
-                    <span className="font-medium text-gray-500">{bug.createdBy?.name}</span>
-                    <span>{formatDistanceToNow(new Date(bug.createdAt), { addSuffix: true, locale: ko })}</span>
-                    {bug.repo && (
-                      <span className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-500">
-                        {bug.repo.split('/')[1] ?? bug.repo}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs text-gray-500">
+                    <span className="flex items-center gap-1">
+                      진행상태:
+                      <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded font-medium ${sl.color}`}>
+                        <StatusIcon className="h-3 w-3" />{sl.text}
+                      </span>
+                    </span>
+                    <span className="flex items-center gap-1">
+                      우선순위:
+                      <span className={`inline-flex px-1.5 py-0.5 rounded font-medium ${pl.color}`}>{pl.text}</span>
+                    </span>
+                    {bug.service && SERVICE_MAP[bug.service] && (
+                      <span className={`inline-flex px-1.5 py-0.5 rounded font-medium ${SERVICE_MAP[bug.service].color}`}>
+                        {SERVICE_MAP[bug.service].text}
                       </span>
                     )}
+                    {ds && (
+                      <span className={`inline-flex px-1.5 py-0.5 rounded font-medium ${ds.color}`}>
+                        {ds.text}
+                      </span>
+                    )}
+                    <span>등록: {formatDate(bug.createdAt)}</span>
+                    <span className="text-gray-400">{bug.createdBy?.name}</span>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-gray-400">
-                    {bug._count?.comments > 0 && (
-                      <span className="flex items-center gap-1">
-                        <MessageSquare className="h-3.5 w-3.5" />
-                        {bug._count.comments}
-                      </span>
-                    )}
-                    {bug._count?.attachments > 0 && (
-                      <span className="flex items-center gap-1">
-                        <Paperclip className="h-3.5 w-3.5" />
-                        {bug._count.attachments}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
+                </Link>
                 {/* GitHub Links */}
                 {bug.githubLinks?.length > 0 && (
-                  <div className="flex flex-wrap gap-2 pl-6.5">
+                  <div className="flex flex-wrap gap-2 mt-2">
                     {bug.githubLinks.map((link) => (
                       <a
                         key={link.id}
@@ -269,7 +244,7 @@ export default function BugsClient() {
                     ))}
                   </div>
                 )}
-              </button>
+              </div>
             );
           })}
         </div>
