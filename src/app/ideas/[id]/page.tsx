@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { ArrowLeft, ThumbsUp, Send, Trash2, Pencil, Check, X } from 'lucide-react';
+import { ThumbsUp, Send, Trash2, Pencil, Check, X } from 'lucide-react';
 import { useIdea, useUpdateIdea, useDeleteIdea, useAddIdeaComment, useToggleVote, useUploadIdeaAttachment, useAddIdeaYoutubeLink, useDeleteIdeaAttachment } from '@/lib/hooks/use-ideas';
 import { Button, Card, Input } from '@/components/ui';
 import { useAuth } from '@/components/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MediaSection } from '@/components/media/media-section';
-import Link from 'next/link';
+import { BackButton } from '@/components/BackButton';
 import type { IdeaDetail, IdeaComment as IdeaCommentType } from '@/lib/types';
 
 const STATUS_OPTIONS = [
@@ -142,9 +142,13 @@ export default function IdeaDetailPage({ params }: { params: Promise<{ id: strin
     <div className="max-w-3xl mx-auto space-y-4">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon-sm" onClick={() => router.back()}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
+        <BackButton
+          fallbackPath="/ideas"
+          label="목록으로"
+          className="inline-flex items-center justify-center h-8 w-8 rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+        >
+          ←
+        </BackButton>
         {editingTitle ? (
           <div className="flex-1 flex items-center gap-1">
             <input
